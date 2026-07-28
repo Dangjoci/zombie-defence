@@ -1872,6 +1872,7 @@ function removeV(v,starved){
 }
 function gameOver(reason){
   if(typeof closeSheet==='function')closeSheet();
+  releaseInput();
   G.over=true;G.reason=reason;mode='over';
   document.getElementById('overT').textContent='마을 소멸';
   document.getElementById('overT').style.color='';
@@ -2443,7 +2444,7 @@ function pickBuild(t){
   selBuild=selBuild===t?null:t; selObj=null;
   document.getElementById('sel').style.display='none';
   if(TOUCH){
-    if(selBuild){ initGhost(); if(mode==='play'||mode==='sheet')mode='place'; }
+    if(selBuild){ releaseInput(); initGhost(); if(mode==='play'||mode==='sheet')mode='place'; }
     else { ghost=null; if(mode==='place')mode='play',last=performance.now(); }
     syncPconf();
   }
@@ -2552,6 +2553,7 @@ function affordableResearch(){
   return false;
 }
 function toggleLab(force){
+  releaseInput();
   const el=document.getElementById('lab');
   const open=force!==undefined?force:el.style.display!=='block';
   if(open){
@@ -2769,6 +2771,7 @@ function refreshStartScreen(){
 let paused=false;
 function setPause(v){
   if(mode!=='play'&&mode!=='paused')return;
+  releaseInput();
   paused=v; mode=v?'paused':'play';
   const pw=document.getElementById('pauseWrap');
   pw.className=v?'on':''; pw.style.display='';   // 인라인 스타일이 남지 않게
@@ -2794,15 +2797,22 @@ function setMob(){
   if(document.body)document.body.classList.toggle('sa',!!sa);
   if(document.body)document.body.classList.toggle('mob',MOB);
 }
+function releaseInput(){
+  try{ joyEnd(); }catch(e){}
+  gdrag=null;
+  if(typeof keys==='object')for(const k in keys)keys[k]=false;
+}
 function openSheet(kind,data){
   if(!G||G.over)return;
   if(mode==='lab')toggleLab(false);
+  releaseInput();
   sheet=kind; sheetBld=data||null;
   if(mode==='play')mode='sheet';
   document.getElementById('sheet').className='on';
   renderSheet(); hap(12);
 }
 function closeSheet(){
+  releaseInput();
   sheet=null; sheetBld=null;
   document.getElementById('sheet').className='';
   if(mode==='sheet'){mode='play';last=performance.now();}
