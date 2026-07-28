@@ -370,8 +370,9 @@ body.mob #mhud{display:flex;position:absolute;left:0;right:0;top:0;z-index:5;poi
 
 /* 우하단 큰 버튼 3개 — 엄지 반경 안 */
 body.mob #mact{display:flex;position:absolute;z-index:6;flex-direction:column;gap:11px;
+  pointer-events:auto;
   right:calc(12px + env(safe-area-inset-right));bottom:calc(88px + env(safe-area-inset-bottom))}
-#mact button{position:relative;width:62px;height:62px;border-radius:50%;border:1px solid #0A0806;
+#mact button{pointer-events:auto;position:relative;width:62px;height:62px;border-radius:50%;border:1px solid #0A0806;
   background-image:var(--tex-metal);background-color:#1A150F;cursor:pointer;
   box-shadow:inset 0 0 0 1px rgba(158,136,98,.2),inset 0 -4px 8px rgba(0,0,0,.5),0 4px 10px rgba(0,0,0,.6);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
@@ -393,9 +394,9 @@ body.mob #maPause{display:flex;flex:none;width:36px;height:34px;pointer-events:a
   box-shadow:inset 0 0 0 1px rgba(158,136,98,.15),0 2px 5px rgba(0,0,0,.55)}
 
 /* ═══ 시트 — 열리면 시간이 멈춘다 ═══ */
-body.mob #sheet.on{display:block;position:absolute;inset:0;z-index:30}
-#shDim{position:absolute;inset:0;background:rgba(4,3,2,.55)}
-#shBody{position:absolute;left:0;right:0;bottom:0;max-height:80%;display:flex;flex-direction:column;
+body.mob #sheet.on{display:block;position:absolute;inset:0;z-index:30;pointer-events:auto}
+#shDim{position:absolute;inset:0;background:rgba(4,3,2,.55);pointer-events:auto}
+#shBody{pointer-events:auto;position:absolute;left:0;right:0;bottom:0;max-height:80%;display:flex;flex-direction:column;
   background-image:var(--tex-metal);background-color:#14100B;border-top:1px solid #0A0806;
   box-shadow:inset 0 1px 0 rgba(196,170,124,.14),0 -8px 28px rgba(0,0,0,.7);
   padding-bottom:calc(10px + env(safe-area-inset-bottom));
@@ -406,7 +407,7 @@ body.mob #sheet.on{display:block;position:absolute;inset:0;z-index:30}
 #shHead .pz{margin-left:9px;font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;color:#8B7F66}
 #shClose{margin-left:auto;width:40px;height:34px;background:#1A150F;border:1px solid #0A0806;
   color:#CFC4A8;font-size:14px;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(158,136,98,.12)}
-#shContent{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 12px;
+#shContent{pointer-events:auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 12px;
   display:flex;flex-direction:column;gap:8px}
 
 /* 건설 카드 */
