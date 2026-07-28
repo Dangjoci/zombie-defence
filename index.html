@@ -348,11 +348,12 @@ body.mob #mhud{display:flex;position:absolute;left:0;right:0;top:0;z-index:5;poi
   flex-direction:column;gap:4px;
   padding:calc(6px + env(safe-area-inset-top)) calc(8px + env(safe-area-inset-right)) 0 calc(8px + env(safe-area-inset-left))}
 #mrow{display:flex;align-items:center;gap:5px}
-.chip{display:inline-flex;align-items:baseline;gap:4px;padding:4px 9px;pointer-events:auto;
+.chip{display:inline-flex;align-items:baseline;gap:4px;padding:5px 10px;pointer-events:auto;
   background-image:var(--tex-metal);background-color:#16120D;border:1px solid #0A0806;
   box-shadow:inset 0 0 0 1px rgba(158,136,98,.15),0 2px 5px rgba(0,0,0,.55)}
-.chip i{font-style:normal;font-size:9px;color:#8B7F66;letter-spacing:.06em}
-.chip b{font-family:var(--mono);font-size:14px;color:var(--hazard);text-shadow:0 1px 0 rgba(0,0,0,.8)}
+.chip i{font-style:normal;font-size:9.5px;color:#A2957A;letter-spacing:.04em}
+.chip b{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--hazard);
+  text-shadow:0 1px 0 #000,0 0 8px rgba(232,163,23,.25)}
 .chip b.bad{color:var(--blood)}
 #mclock{margin-left:auto;flex:none;text-align:right;pointer-events:auto;padding:3px 9px;
   background-image:var(--tex-metal);background-color:#16120D;border:1px solid #0A0806;
@@ -360,33 +361,46 @@ body.mob #mhud{display:flex;position:absolute;left:0;right:0;top:0;z-index:5;poi
 #mclock b{display:block;font-family:var(--mono);font-size:15px;color:var(--paper);line-height:1.05}
 #mclock span{font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;color:#8B7F66}
 #mclock span.hot{color:var(--blood)}
-#mbars{display:flex;flex-direction:column;gap:3px}
-.mbar{display:flex;align-items:center;gap:5px}
-.mbar i{font-style:normal;font-size:8.5px;width:26px;color:#8B7F66;letter-spacing:.08em;text-align:right;
-  text-shadow:0 1px 0 #000}
-.mbar .tr{flex:1;height:5px;background:rgba(0,0,0,.68);border:1px solid rgba(158,136,98,.25)}
-.mbar .tr>div{height:100%;background:var(--core);transition:width .25s}
-.mbar.hp .tr>div{background:#C86A4A}
+/* 상태바 — 화면을 가로지르지 않게 절반씩 나눠 나란히 둔다 */
+#mbars{display:flex;gap:10px;align-items:center}
+.mbar{display:flex;align-items:center;gap:5px;flex:1;min-width:0}
+.mbar i{font-style:normal;font-size:9px;color:#A2957A;letter-spacing:.06em;flex:none;
+  text-shadow:0 1px 2px #000}
+.mbar .tr{flex:1;min-width:0;height:7px;background:rgba(0,0,0,.75);
+  border:1px solid rgba(158,136,98,.3);box-shadow:0 1px 3px rgba(0,0,0,.5)}
+.mbar .tr>div{height:100%;background:linear-gradient(180deg,#7FD8CE,#3E9C93);transition:width .2s}
+.mbar.hp .tr>div{background:linear-gradient(180deg,#E08A66,#B0543A)}
+.mbar .tr>div.low{background:linear-gradient(180deg,#E8705A,#A32E1E)}
+/* 최종 웨이브 카운트다운 */
+#mprep{display:none;margin-top:3px;padding:4px 10px;align-self:flex-start;
+  background:rgba(20,10,6,.9);border:1px solid #7A2A1E;
+  font-family:var(--mono);font-size:11px;font-weight:700;color:#FF9A78;letter-spacing:.06em;
+  box-shadow:0 2px 6px rgba(0,0,0,.6)}
+#mprep.on{display:block;animation:prepPulse 1s ease-in-out infinite}
+@keyframes prepPulse{50%{color:#FFD2B0;border-color:#C0392B}}
 
 /* 우하단 큰 버튼 3개 — 엄지 반경 안 */
-body.mob #mact{display:flex;position:absolute;z-index:6;flex-direction:column;gap:11px;
-  pointer-events:auto;
-  right:calc(12px + env(safe-area-inset-right));bottom:calc(88px + env(safe-area-inset-bottom))}
-#mact button{pointer-events:auto;position:relative;width:62px;height:62px;border-radius:50%;border:1px solid #0A0806;
+/* 오른손 엄지가 그리는 호를 따라 — 아래일수록 바깥, 위일수록 안쪽 */
+body.mob #mact{display:flex;position:absolute;z-index:6;flex-direction:column;gap:10px;
+  align-items:flex-end;pointer-events:auto;
+  right:calc(14px + env(safe-area-inset-right));bottom:calc(92px + env(safe-area-inset-bottom))}
+body.mob #maBuild{margin-right:30px}
+body.mob #maVill{margin-right:11px}
+#mact button{pointer-events:auto;position:relative;width:54px;height:54px;border-radius:50%;border:1px solid #0A0806;
   background-image:var(--tex-metal);background-color:#1A150F;cursor:pointer;
   box-shadow:inset 0 0 0 1px rgba(158,136,98,.2),inset 0 -4px 8px rgba(0,0,0,.5),0 4px 10px rgba(0,0,0,.6);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
   -webkit-tap-highlight-color:transparent}
 #mact button:active{transform:scale(.94)}
-#mact button img{height:26px;max-width:40px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8));pointer-events:none}
-#mact button span{font-size:9.5px;font-weight:700;color:#CFC4A8;letter-spacing:.04em;pointer-events:none}
-#mact button b.badge{position:absolute;top:-3px;right:-3px;min-width:19px;height:19px;border-radius:10px;
+#mact button img{height:22px;max-width:34px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8));pointer-events:none}
+#mact button span{font-size:9px;font-weight:700;color:#DCD2BA;letter-spacing:.04em;pointer-events:none}
+#mact button b.badge{position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;border-radius:9px;
   background:var(--blood);color:#fff;font-size:10.5px;font-weight:800;display:flex;align-items:center;
   justify-content:center;padding:0 4px;border:1px solid #0A0806;box-shadow:0 1px 3px rgba(0,0,0,.6)}
 #mact button b.badge:empty{display:none}
-#maLab svg{position:absolute;inset:-4px;width:70px;height:70px;transform:rotate(-90deg);pointer-events:none}
+#maLab svg{position:absolute;inset:-4px;width:62px;height:62px;transform:rotate(-90deg);pointer-events:none}
 #maLab svg circle{fill:none;stroke:var(--hazard);stroke-width:2.6;stroke-linecap:round;
-  stroke-dasharray:207;stroke-dashoffset:207}
+  stroke-dasharray:182;stroke-dashoffset:182}
 body.mob #maPause{display:flex;flex:none;width:36px;height:34px;pointer-events:auto;
   align-items:center;justify-content:center;cursor:pointer;
   background-image:var(--tex-metal);background-color:#16120D;border:1px solid #0A0806;
@@ -405,7 +419,12 @@ body.mob #sheet.on{display:block;position:absolute;inset:0;z-index:30;pointer-ev
 #shHead{display:flex;align-items:center;padding:11px 14px 9px;border-bottom:1px solid rgba(158,136,98,.18)}
 #shHead b{font-size:15px;color:var(--hazard);letter-spacing:.05em;text-shadow:0 1px 0 rgba(0,0,0,.8)}
 #shHead .pz{margin-left:9px;font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;color:#8B7F66}
-#shClose{margin-left:auto;width:40px;height:34px;background:#1A150F;border:1px solid #0A0806;
+#labX{display:none;position:absolute;z-index:31;pointer-events:auto;
+  top:calc(10px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right));
+  width:46px;height:46px;border-radius:50%;align-items:center;justify-content:center;
+  background:#1A150F;border:1px solid #0A0806;color:#E4DAC2;font-size:17px;cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(158,136,98,.2),0 3px 9px rgba(0,0,0,.6)}
+#shClose{margin-left:auto;width:44px;height:38px;background:#1A150F;border:1px solid #0A0806;
   color:#CFC4A8;font-size:14px;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(158,136,98,.12)}
 #shContent{pointer-events:auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 12px;
   display:flex;flex-direction:column;gap:8px}
@@ -462,9 +481,9 @@ body.mob #sheet.on{display:block;position:absolute;inset:0;z-index:30;pointer-ev
 
 /* 모바일에서는 기존 상시 패널을 숨긴다 */
 body.mob #top,body.mob #build,body.mob #sel{display:none !important}
-body.mob #banner{top:calc(64px + env(safe-area-inset-top));width:min(58vw,240px)}
+body.mob #banner{top:calc(78px + env(safe-area-inset-top));width:min(60vw,250px)}
 body.mob #banner .msg{font-size:10.5px;padding:4px 9px}
-body.mob #alert{top:calc(96px + env(safe-area-inset-top))}
+body.mob #alert{top:calc(110px + env(safe-area-inset-top))}
 body.mob #buffBar{top:auto;bottom:calc(160px + env(safe-area-inset-bottom));left:calc(10px + env(safe-area-inset-left))}
 body.mob #pconf{bottom:calc(14px + env(safe-area-inset-bottom));width:min(94vw,430px)}
 
@@ -538,6 +557,7 @@ body.mob #pconf{bottom:calc(14px + env(safe-area-inset-bottom));width:min(94vw,4
       <div class="mbar"><i>코어</i><div class="tr"><div id="mCore" style="width:100%"></div></div></div>
       <div class="mbar hp"><i>체력</i><div class="tr"><div id="mHp" style="width:100%"></div></div></div>
     </div>
+    <div id="mprep"></div>
   </div>
   <div id="mact">
     <button id="maBuild"><img id="maBuildIc" alt=""><span>건설</span><b class="badge" id="maBuildBd"></b></button>
@@ -550,6 +570,7 @@ body.mob #pconf{bottom:calc(14px + env(safe-area-inset-bottom));width:min(94vw,4
       <div id="shContent"></div>
     </div>
   </div>
+  <button id="labX">✕</button>
   <div id="rotate"><div class="ph"></div><p>세로 모드로 돌려주세요</p></div>
   <div id="pauseWrap">
     <div class="pt">일 시 정 지</div>
@@ -796,7 +817,7 @@ const BAR=['core','tower','farm','house','wall','lab'];
 const BGROW={tower:1.33,farm:1.39,house:1.37,lab:1.58,wall:1.0};
 /* 고철 획득 배율 — 웨이브 6 이후로는 더 이상 늘지 않는다 */
 /* 탐색대원은 나가서 줍는다 — 부대원 1명당 고철 +10% */
-const dropMul=()=>(1+.04*Math.min(WV()-1,4))*(1+0.10*squad().length);
+const dropMul=()=>(1+.04*Math.min(WV()-1,4))*(1+0.10*squad().length)*(G.t>=DUNG_HARD?1.25:1);
 const bCost=t=>Math.round(BDEF[t].cost*Math.pow(BGROW[t],G.bs.filter(b=>b.t===t).length));
 /* 연구는 연구자원만으로는 부족하고 고철도 함께 든다 — 자재 없이 개발만 할 수는 없다 */
 /* 연구는 고철을 선불로 내고 '시간'을 들여 완성한다.
@@ -907,7 +928,7 @@ function saveGame(){
     nextEvent:G.nextEvent, rescueDone:G.rescueDone, evStage:G.evStage,
     unlock:G.unlock, popCapBase:G.popCapBase, starve:G.starve, ruins:G.ruins,
     buffs:G.buffs, perks:G.perks, itemCd:G.itemCd,
-    nextDung:G.nextDung, dungCleared:G.dungCleared, dungBroke:G.dungBroke,
+    nextDung:G.nextDung, dungCleared:G.dungCleared, dungBroke:G.dungBroke, finalPrep:G.finalPrep,
     vs:G.vs.map(v=>({id:v.id,name:v.name,role:v.role,sex:v.sex,apt:v.apt,
                      job:v.job==='squad'?'squad':null,manual:v.manual,hp:v.hp})),
     bs:G.bs.map(b=>({t:b.t,gx:b.gx,gy:b.gy,hp:b.hp,tier:b.tier,paid:b.paid,
@@ -921,7 +942,7 @@ function loadGame(){
   reset();
   for(const k of ['t','scrap','food','kills','maxPop','R','rs','wave','phase','waveT',
                   'esc2','nextEvent','rescueDone','evStage','unlock','popCapBase','starve',
-                  'buffs','perks','itemCd','nextDung','dungCleared','dungBroke'])
+                  'buffs','perks','itemCd','nextDung','dungCleared','dungBroke','finalPrep'])
     if(d[k]!==undefined)G[k]=d[k];
   if(d.ruins&&d.ruins.length)G.ruins=d.ruins;
   G.core.hp=d.core.hp; G.core.lvl=d.core.lvl;
@@ -958,7 +979,7 @@ function reset(){
     p:{x:0,y:130,hp:12,maxHp:12,cd:0,inv:0,ang:-Math.PI/2,trail:[]},
     zs:[],dr:[],sh:[],pt:[],bs:[],vs:[],esc:[],fx:[],items:[],
     buffs:{}, perks:{}, itemCd:38,
-    dung:[], nextDung:DUNG_T, dungCleared:0, dungBroke:0,
+    dung:[], nextDung:DUNG_T, dungCleared:0, dungBroke:0, finalPrep:false, won:false,
     grid:{}, popCapBase:7,
     spawnAcc:0, nextEvent:24, evStage:0, rescue:null, rescueDone:0, esc2:null,
     wave:0, phase:'grace', waveT:0,
@@ -993,6 +1014,9 @@ const lullDur=w=>w%5===0?LULL_LONG:LULL;
 const isLongLull=()=>G.phase==='lull'&&G.wave%5===0;
 const WV=()=>Math.max(1,G.wave);
 const DUNG_T=1200;          // 20분부터 던전이 생긴다
+const DUNG_HARD=1500;       // 25분부터 둥지가 잦고 커진다
+const PREP_T=1740;          // 29분 — 마지막 준비 소강
+const FINAL_T=1800;         // 30분 — 최종 웨이브
 const WCAP=14;              // 여기까지는 가파르게, 이후로는 완만하게 계속 오른다
 /* 완전히 멈추면 후반이 무한정 버텨진다 — 상한 뒤에도 22%의 기울기는 남긴다 */
 const wEff=w=>Math.min(w,WCAP)+Math.max(0,w-WCAP)*0.22;
@@ -1006,9 +1030,10 @@ const waveSpd  =w=>1+0.012*(w-1);
 function spawnDungeon(){
   const a=rnd(0,TAU), r=rnd(1250,2050);
   const c=G.dungCleared+G.dungBroke;
-  const hp=4200*(1+0.30*c);
+  const hard=G.t>=DUNG_HARD;
+  const hp=4200*(1+0.30*c)*(hard?1.10:1);
   const d={id:Math.random(),x:Math.cos(a)*r,y:Math.sin(a)*r,hp,maxHp:hp,
-    t:0, breakAt:Math.max(62,110-7*c), acc:0, flash:0, warned:false};
+    t:0, breakAt:Math.max(hard?52:62,(hard?100:110)-7*c), acc:0, flash:0, warned:false};
   G.dung.push(d);
   say(`둥지가 생겼다 — 약 ${Math.round(r)}m. 터지기 전에 부숴라.`,'bad');
   bigAlert('둥지 발생',`약 ${Math.round(r)}m · ${Math.round(d.breakAt)}초 후 붕괴`,'bad',3.4,'☣');
@@ -1033,6 +1058,32 @@ function breakDungeon(d,i){
   shake(14); sfx('boss'); hap([0,120,60,160]);
   say(`둥지가 터졌다 — ${n+extra}마리가 몰려온다.`,'bad');
   bigAlert('둥 지 붕 괴',`${n+extra}마리가 마을로 향한다`,'bad',3.4,'☠');
+}
+function startFinalWave(){
+  const w=G.wave;
+  say('최종 웨이브 — 전부 쓸어버려라.','bad');
+  bigAlert('최 종 웨 이 브','남은 것을 모두 없애면 끝난다','bad',4.2,'☠');
+  const n=Math.round(waveBurst(w)*2.3);
+  for(let i=0;i<n;i++)spawnZ(pickKind());
+  for(let i=0;i<4;i++)spawnZ('boss');
+  shake(14); sfx('boss'); hap([0,140,60,140,60,200]);
+}
+function victory(){
+  if(typeof closeSheet==='function')closeSheet();
+  G.over=true; G.won=true; G.reason='마을이 살아남았다'; mode='over';
+  lsDel(SKEY);
+  if(G.t>bestTime())lsSet(BKEY,String(Math.floor(G.t)));
+  hap([0,60,50,60,50,220]);
+  document.getElementById('overT').textContent='생 존';
+  document.getElementById('overT').style.color='#E8A317';
+  document.getElementById('overR').textContent=
+    `30분을 버텨냈다 · 생존자 ${G.vs.length}명`;
+  document.getElementById('oTime').textContent=fmt(G.t);
+  document.getElementById('oKill').textContent=G.kills;
+  document.getElementById('oPop').textContent=G.maxPop;
+  document.getElementById('oWave').textContent=G.wave;
+  document.getElementById('over').style.display='flex';
+  sfx('good');
 }
 function onWaveStart(){
   const w=G.wave;
@@ -1100,14 +1151,25 @@ function mhud(){
   if(G.phase==='grace'){w.textContent='정착';w.className='';}
   else if(G.phase==='assault'){w.textContent='웨이브 '+G.wave;w.className='hot';}
   else{w.textContent='소강';w.className='';}
-  q('mCore').style.width=Math.max(0,G.core.hp/G.core.maxHp*100)+'%';
-  q('mHp').style.width=Math.max(0,G.p.hp/pMaxHp()*100)+'%';
+  const cr=Math.max(0,G.core.hp/G.core.maxHp), hr=Math.max(0,G.p.hp/pMaxHp());
+  const ce=q('mCore'), he=q('mHp');
+  ce.style.width=cr*100+'%'; ce.className=cr<.3?'low':'';
+  he.style.width=hr*100+'%'; he.className=hr<.3?'low':'';
+  /* 최종 웨이브 카운트다운 */
+  const pe=q('mprep');
+  if(G.finalPrep&&G.phase!=='final'){
+    pe.className='on';
+    pe.textContent=`최종 웨이브까지 ${Math.max(0,Math.ceil(FINAL_T-G.t))}초 — 준비하세요`;
+  } else if(G.phase==='final'){
+    pe.className='on';
+    pe.textContent=`최종 웨이브 · 남은 적 ${G.zs.length}`;
+  } else pe.className='';
   /* 배지 — 마을: 대기 인원 / 연구: 진행 링과 미진행 표시 */
   const idle=G.vs.filter(v=>v.role==='worker'&&!v.job&&!G.bs.some(b=>b.worker===v)&&!hurtV(v)).length;
   q('maVillBd').textContent=idle>0?idle:'';
   q('maLabBd').textContent=(!G.rs&&labPower()>0)?'!':'';
   const ring=q('maRing');
-  if(ring){const c=207, pr=G.rs?Math.min(1,G.rs.done/G.rs.work):0;
+  if(ring){const c=182, pr=G.rs?Math.min(1,G.rs.done/G.rs.work):0;
     ring.style.strokeDashoffset=String(c*(1-pr));}
   /* 배치 중이면 시트 버튼 숨김 (확정바와 겹치지 않게) */
   document.getElementById('mact').style.display=(TOUCH&&ghost)?'none':'';
@@ -1261,8 +1323,23 @@ function update(dt){
 
   if(g.esc2===null&&g.t>150)escalate();
 
+  /* ── 최종 국면 ──
+     29분에 긴 준비 소강이 걸리고, 30분에 최종 웨이브가 온다.
+     최종 웨이브는 추가 스폰이 없다 — 몰려온 것을 전부 없애면 클리어. */
+  if(g.esc2!==null&&!g.finalPrep&&g.phase!=='final'&&g.t>=PREP_T){
+    g.finalPrep=true; g.phase='lull'; g.waveT=0;
+    for(let i=g.dung.length-1;i>=0;i--){burst(g.dung[i].x,g.dung[i].y,'#E8A317',20);g.dung.splice(i,1);}
+    say('무전이 끊겼다. 마지막이 온다 — 준비하라.','bad');
+    bigAlert('마지막 웨이브를 준비하세요',`${Math.round(FINAL_T-g.t)}초 뒤 최종 공세`,'',5.2,'!');
+    sfx('event'); hap([0,120,80,120]);
+  }
+  if(g.finalPrep&&g.phase!=='final'&&g.t>=FINAL_T){
+    g.phase='final'; g.wave++; startFinalWave();
+  }
+  if(g.phase==='final'&&g.zs.length===0){ victory(); return; }
+
   /* 웨이브 — 공세와 소강 */
-  if(g.esc2!==null){
+  if(g.esc2!==null&&!g.finalPrep&&g.phase!=='final'){
     g.waveT+=dt;
     const dur=g.phase==='assault'?ASSAULT:lullDur(g.wave);
     if(g.waveT>=dur){
@@ -1278,9 +1355,10 @@ function update(dt){
   }
 
   /* 던전 진행 */
-  if(g.t>=g.nextDung&&g.dung.length<3){
+  if(g.t>=g.nextDung&&g.dung.length<3&&g.t<PREP_T){
     spawnDungeon();
-    g.nextDung=g.t+Math.max(52,132-11*(g.dungCleared+g.dungBroke));
+    const c=g.dungCleared+g.dungBroke, hard=g.t>=DUNG_HARD;
+    g.nextDung=g.t+Math.max(hard?46:52,(hard?116:132)-11*c);
   }
   for(let i=g.dung.length-1;i>=0;i--){
     const d=g.dung[i];
@@ -1299,7 +1377,8 @@ function update(dt){
   }
 
   /* 스폰 */
-  const rate = g.esc2===null ? 1.15+g.t*0.009
+  const rate = g.phase==='final' ? 0
+             : g.esc2===null ? 1.15+g.t*0.009
              : g.phase==='assault' ? waveRate(g.wave) : (isLongLull()?0.05:0.16);
   g.spawnAcc+=rate*dt;
   while(g.spawnAcc>=1){g.spawnAcc--;spawnZ(pickKind());}
@@ -1718,6 +1797,8 @@ function removeV(v,starved){
 function gameOver(reason){
   if(typeof closeSheet==='function')closeSheet();
   G.over=true;G.reason=reason;mode='over';
+  document.getElementById('overT').textContent='마을 소멸';
+  document.getElementById('overT').style.color='';
   lsDel(SKEY);                                   // 한 판이 끝나면 이어하기는 사라진다
   if(G.t>bestTime())lsSet(BKEY,String(Math.floor(G.t)));
   hap([0,90,60,140]);
@@ -2293,7 +2374,11 @@ function pickBuild(t){
   if(!G.unlock[t]){say('아직 해금되지 않았다.','bad');return;}
   selBuild=selBuild===t?null:t; selObj=null;
   document.getElementById('sel').style.display='none';
-  if(TOUCH){ if(selBuild)initGhost(); else ghost=null; syncPconf(); }
+  if(TOUCH){
+    if(selBuild){ initGhost(); if(mode==='play'||mode==='sheet')mode='place'; }
+    else { ghost=null; if(mode==='place')mode='play',last=performance.now(); }
+    syncPconf();
+  }
 }
 function renderSel(){
   const b=selObj;if(!b)return;
@@ -2404,7 +2489,9 @@ function toggleLab(force){
   if(open){
     if(!G.bs.some(b=>b.t==='lab')){say('연구소를 먼저 건설해야 한다.','bad');return;}
     renderLab();el.style.display='block';mode='lab';
-  } else {el.style.display='none';mode='play';}
+    document.getElementById('labX').style.display=MOB?'flex':'none';
+  } else {el.style.display='none';mode='play';last=performance.now();
+    document.getElementById('labX').style.display='none';}
 }
 
 /* ═══════════ 입력 ═══════════ */
@@ -2452,7 +2539,11 @@ function initGhost(){
   }
   ghost={x:p.x+Math.cos(p.ang)*110, y:p.y+Math.sin(p.ang)*110};
 }
-function endPlace(){ghost=null;selBuild=null;refreshBuildCosts();syncPconf();}
+function endPlace(){
+  ghost=null;selBuild=null;gdrag=null;
+  if(mode==='place'){mode='play';last=performance.now();}
+  refreshBuildCosts();syncPconf();
+}
 function syncPconf(){
   const el=document.getElementById('pconf');
   const on=TOUCH&&selBuild&&selBuild!=='core'&&ghost;
@@ -2473,6 +2564,13 @@ function tapSelect(wx,wy){
   else{selObj=null;document.getElementById('sel').style.display='none';}
 }
 cv.addEventListener('pointerdown',e=>{
+  /* 'place' = 건물 자리를 잡는 중. 시간은 멈춰 있고 고스트만 끌 수 있다. */
+  if(mode==='place'&&G){
+    try{cv.setPointerCapture(e.pointerId);}catch(_){}
+    gdrag={id:e.pointerId,x:e.clientX,y:e.clientY};
+    if(!TOUCH){const w=toWorld(e.clientX,e.clientY);ghost.x=w.x;ghost.y=w.y;syncPconf();}
+    return;
+  }
   if(mode!=='play'||!G)return;
   try{cv.setPointerCapture(e.pointerId);}catch(_){}
   if(TOUCH){
@@ -2490,6 +2588,10 @@ cv.addEventListener('pointerdown',e=>{
   tapSelect(w.x,w.y);
 });
 cv.addEventListener('pointermove',e=>{
+  if(mode==='place'&&gdrag&&e.pointerId===gdrag.id&&ghost){
+    ghost.x+=(e.clientX-gdrag.x)/ZOOM; ghost.y+=(e.clientY-gdrag.y)/ZOOM;
+    gdrag.x=e.clientX; gdrag.y=e.clientY; syncPconf(); return;
+  }
   if(joy.act&&e.pointerId===joy.id){joyMove(e);return;}
   if(gdrag&&e.pointerId===gdrag.id&&ghost){
     ghost.x+=(e.clientX-gdrag.x)/ZOOM; ghost.y+=(e.clientY-gdrag.y)/ZOOM;
@@ -2586,7 +2688,8 @@ let paused=false;
 function setPause(v){
   if(mode!=='play'&&mode!=='paused')return;
   paused=v; mode=v?'paused':'play';
-  document.getElementById('pauseWrap').className=v?'on':'';
+  const pw=document.getElementById('pauseWrap');
+  pw.className=v?'on':''; pw.style.display='';   // 인라인 스타일이 남지 않게
   document.getElementById('btnPause').className='sysbtn'+(v?' on':'');
   if(!v)last=performance.now();
   if(v)saveGame();
@@ -2813,9 +2916,13 @@ if(typeof location!=='undefined'&&location.protocol&&location.protocol.startsWit
 }
 document.getElementById('maBuild').onclick=()=>{ if(sheet==='build')return closeSheet(); openSheet('build'); };
 document.getElementById('maVill').onclick =()=>{ if(sheet==='vill')return closeSheet(); openSheet('vill'); };
-document.getElementById('maLab').onclick  =()=>{ closeSheet(); toggleLab(true); };
-document.getElementById('maPause').onclick=()=>{ if(mode==='play'){mode='paused';document.getElementById('pauseWrap').style.display='flex';} };
+document.getElementById('maLab').onclick  =()=>{ if(mode==='lab')return toggleLab(false); closeSheet(); toggleLab(true); };
+document.getElementById('maPause').onclick=()=>setPause(mode!=='paused');
 document.getElementById('shClose').onclick=closeSheet;
+document.getElementById('labX').onclick=()=>toggleLab(false);
+document.getElementById('lab').addEventListener('pointerdown',e=>{
+  if(e.target.id==='lab')toggleLab(false);      // 바깥 여백을 누르면 닫힌다
+});
 document.getElementById('shDim').onclick=closeSheet;
 </script>
 </body>
