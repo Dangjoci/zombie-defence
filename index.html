@@ -276,12 +276,21 @@ select.asg:focus{outline:1px solid var(--hazard)}
   background:repeating-linear-gradient(45deg,var(--hazard) 0 9px,#0b0f0d 9px 18px);opacity:.75}
 
 /* 조이스틱은 손을 댄 자리에 나타난다 — 고정 위치는 엄지가 닿는 곳이 기기마다 달라 불편하다 */
-#joy{position:absolute;width:132px;height:132px;border-radius:50%;display:none;
-  border:1px solid rgba(232,163,23,.32);background:rgba(11,9,6,.30);
-  pointer-events:none;transform:translate(-50%,-50%);z-index:3}
+/* 조이스틱 — 화면 좌하단에 고정. 손가락이 어디에 닿든 중심은 늘 같은 자리다. */
+#joy{position:absolute;width:124px;height:124px;border-radius:50%;display:none;
+  border:2px solid rgba(232,163,23,.28);background:radial-gradient(circle,rgba(20,15,9,.42),rgba(11,9,6,.22));
+  pointer-events:none;z-index:3;box-shadow:0 3px 12px rgba(0,0,0,.45)}
 #joy.on{display:block}
-#knob{position:absolute;width:52px;height:52px;border-radius:50%;background:rgba(232,163,23,.30);
-  border:1px solid var(--hazard);left:40px;top:40px}
+#joy::after{content:"";position:absolute;inset:46px;border-radius:50%;
+  border:1px dashed rgba(232,163,23,.18)}
+#knob{position:absolute;width:52px;height:52px;border-radius:50%;
+  background:radial-gradient(circle at 38% 34%,rgba(255,208,120,.55),rgba(200,140,30,.32));
+  border:2px solid var(--hazard);left:36px;top:36px;
+  box-shadow:0 2px 8px rgba(0,0,0,.55);transition:left .05s,top .05s}
+body.mob #joy{left:calc(20px + env(safe-area-inset-left));
+  bottom:calc(132px + env(safe-area-inset-bottom));top:auto;display:block}
+body.sa.mob #joy{bottom:calc(84px + env(safe-area-inset-bottom))}
+body.placing #joy{display:none !important}
 /* 터치 배치 확정 바 */
 #pconf{position:absolute;left:50%;transform:translateX(-50%);display:none;gap:10px;
   bottom:calc(112px + env(safe-area-inset-bottom));pointer-events:auto;z-index:4}
@@ -380,27 +389,28 @@ body.mob #mhud{display:flex;position:absolute;left:0;right:0;top:0;z-index:5;poi
 @keyframes prepPulse{50%{color:#FFD2B0;border-color:#C0392B}}
 
 /* 우하단 큰 버튼 3개 — 엄지 반경 안 */
-/* 오른손 엄지가 그리는 호를 따라 — 아래일수록 바깥, 위일수록 안쪽 */
-body.mob #mact{display:flex;position:absolute;z-index:6;flex-direction:column;gap:10px;
-  align-items:flex-end;pointer-events:auto;
-  right:calc(14px + env(safe-area-inset-right));bottom:calc(92px + env(safe-area-inset-bottom))}
-body.mob #maBuild{margin-right:30px}
-body.mob #maVill{margin-right:11px}
-#mact button{pointer-events:auto;position:relative;width:54px;height:54px;border-radius:50%;border:1px solid #0A0806;
-  background-image:var(--tex-metal);background-color:#1A150F;cursor:pointer;
-  box-shadow:inset 0 0 0 1px rgba(158,136,98,.2),inset 0 -4px 8px rgba(0,0,0,.5),0 4px 10px rgba(0,0,0,.6);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+/* 화면 최하단에 모은 4개 버튼. 사파리 하단 툴바에 가리지 않도록 여백을 둔다. */
+body.mob #mact{display:flex;position:absolute;left:0;right:0;bottom:0;z-index:6;gap:6px;
+  pointer-events:auto;align-items:stretch;
+  background:linear-gradient(180deg,rgba(10,8,5,0),rgba(10,8,5,.72) 42%);
+  padding:8px calc(8px + env(safe-area-inset-right)) calc(58px + env(safe-area-inset-bottom))
+          calc(8px + env(safe-area-inset-left))}
+body.sa.mob #mact{padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+#mact button{pointer-events:auto;position:relative;flex:1;min-width:0;height:56px;border-radius:9px;
+  border:1px solid #0A0806;background-image:var(--tex-metal);background-color:#1A150F;cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(158,136,98,.2),inset 0 -4px 8px rgba(0,0,0,.5),0 3px 8px rgba(0,0,0,.6);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
   -webkit-tap-highlight-color:transparent}
 #mact button:active{transform:scale(.94)}
-#mact button img{height:22px;max-width:34px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8));pointer-events:none}
-#mact button span{font-size:9px;font-weight:700;color:#DCD2BA;letter-spacing:.04em;pointer-events:none}
+#mact button img{height:21px;max-width:32px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8));pointer-events:none}
+#mact button span{font-size:9.5px;font-weight:700;color:#DCD2BA;letter-spacing:.04em;pointer-events:none}
 #mact button b.badge{position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;border-radius:9px;
   background:var(--blood);color:#fff;font-size:10.5px;font-weight:800;display:flex;align-items:center;
   justify-content:center;padding:0 4px;border:1px solid #0A0806;box-shadow:0 1px 3px rgba(0,0,0,.6)}
 #mact button b.badge:empty{display:none}
-#maLab svg{position:absolute;inset:-4px;width:62px;height:62px;transform:rotate(-90deg);pointer-events:none}
-#maLab svg circle{fill:none;stroke:var(--hazard);stroke-width:2.6;stroke-linecap:round;
-  stroke-dasharray:182;stroke-dashoffset:182}
+#maLab svg{position:absolute;left:0;right:0;bottom:2px;width:100%;height:3px;pointer-events:none}
+#maLab svg rect{fill:var(--hazard)}
+/* 연구 진행은 버튼 아래 가는 막대로 — 0%면 폭이 0이라 헷갈릴 여지가 없다 */
 body.mob #maPause{display:flex;flex:none;width:36px;height:34px;pointer-events:auto;
   align-items:center;justify-content:center;cursor:pointer;
   background-image:var(--tex-metal);background-color:#16120D;border:1px solid #0A0806;
@@ -468,6 +478,27 @@ body.mob #sheet.on{display:block;position:absolute;inset:0;z-index:30;pointer-ev
 .vopts button.warn{color:#CE8574;border-color:#5a3128}
 .vopts button:disabled{opacity:.38}
 
+/* 건물 관리 카드 */
+.allrep{width:100%;min-height:46px;font-size:13px;font-weight:700;cursor:pointer;
+  background:linear-gradient(180deg,#F0B62E,#C98A12);color:#221806;border:1px solid #7A5510;
+  box-shadow:0 3px 0 #6b4a0e}
+.allrep:disabled{background:linear-gradient(180deg,#5a4a34,#3a3024);color:#9c8f78;box-shadow:none}
+.gcard{background:rgba(24,19,13,.85);border:1px solid #0A0806;
+  box-shadow:inset 0 0 0 1px rgba(158,136,98,.1)}
+.gtop{display:flex;align-items:center;gap:10px;padding:9px 11px 6px}
+.gtop img{height:40px;max-width:52px;flex:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.7))}
+.gi{flex:1;min-width:0}
+.gn{font-size:13px;font-weight:700;color:#E4DAC2}
+.gw{font-size:10.5px;margin:2px 0 4px}
+.gp{font-family:var(--mono);font-size:12px;color:#CFC4A8;flex:none}
+.gp i{font-style:normal;font-size:9px;color:#8B7F66}
+.grow{display:flex;gap:6px;padding:0 11px 10px}
+.grow button{flex:1;min-height:42px;font-size:11.5px;font-weight:700;cursor:pointer;
+  background:#1A150F;border:1px solid #0A0806;color:#CFC4A8;
+  box-shadow:inset 0 0 0 1px rgba(158,136,98,.12)}
+.grow button.warn{color:#CE8574;border-color:#5a3128;flex:0 0 74px}
+.grow button:disabled{opacity:.35}
+.vhead b.bad{color:var(--blood)}
 /* 건물 상세 시트 */
 .gact{display:flex;flex-direction:column;gap:8px}
 .gact button{min-height:48px;font-size:13.5px;font-weight:700;cursor:pointer;
@@ -484,8 +515,9 @@ body.mob #top,body.mob #build,body.mob #sel{display:none !important}
 body.mob #banner{top:calc(78px + env(safe-area-inset-top));width:min(60vw,250px)}
 body.mob #banner .msg{font-size:10.5px;padding:4px 9px}
 body.mob #alert{top:calc(110px + env(safe-area-inset-top))}
-body.mob #buffBar{top:auto;bottom:calc(160px + env(safe-area-inset-bottom));left:calc(10px + env(safe-area-inset-left))}
-body.mob #pconf{bottom:calc(14px + env(safe-area-inset-bottom));width:min(94vw,430px)}
+body.mob #buffBar{top:auto;bottom:calc(270px + env(safe-area-inset-bottom));left:calc(10px + env(safe-area-inset-left))}
+body.mob #pconf{bottom:calc(84px + env(safe-area-inset-bottom));width:min(94vw,430px)}
+body.sa.mob #pconf{bottom:calc(36px + env(safe-area-inset-bottom))}
 
 /* 가로로 돌리면 안내 */
 @media (orientation:landscape) and (pointer:coarse) and (max-height:520px){
@@ -562,7 +594,8 @@ body.mob #pconf{bottom:calc(14px + env(safe-area-inset-bottom));width:min(94vw,4
   <div id="mact">
     <button id="maBuild"><img id="maBuildIc" alt=""><span>건설</span><b class="badge" id="maBuildBd"></b></button>
     <button id="maVill"><img id="maVillIc" alt=""><span>마을</span><b class="badge" id="maVillBd"></b></button>
-    <button id="maLab"><svg viewBox="0 0 70 70"><circle id="maRing" cx="35" cy="35" r="33"/></svg><img id="maLabIc" alt=""><span>연구</span><b class="badge" id="maLabBd"></b></button>
+    <button id="maBldg"><img id="maBldgIc" alt=""><span>건물</span><b class="badge" id="maBldgBd"></b></button>
+    <button id="maLab"><svg viewBox="0 0 100 3" preserveAspectRatio="none"><rect id="maRing" x="0" y="0" width="0" height="3"/></svg><img id="maLabIc" alt=""><span>연구</span><b class="badge" id="maLabBd"></b></button>
   </div>
   <div id="sheet"><div id="shDim"></div>
     <div id="shBody">
@@ -788,7 +821,7 @@ function resize(){
   /* 백업 — 스타일시트가 어떻든 표시 크기를 뷰포트에 맞춘다 */
   cv.style.width=VW+'px';cv.style.height=VH+'px';
   ctx.setTransform(DPR,0,0,DPR,0,0);
-  ZOOM=Math.min(1,Math.max(VW/MINVIEW, VH/1320));}
+  ZOOM=Math.min(1,Math.max(VW/MINVIEW, VH/1180));}
 addEventListener('resize',resize);
 addEventListener('orientationchange',()=>setTimeout(resize,120));
 if(typeof visualViewport!=='undefined'&&visualViewport)visualViewport.addEventListener('resize',resize);
@@ -1169,10 +1202,17 @@ function mhud(){
   q('maVillBd').textContent=idle>0?idle:'';
   q('maLabBd').textContent=(!G.rs&&labPower()>0)?'!':'';
   const ring=q('maRing');
-  if(ring){const c=182, pr=G.rs?Math.min(1,G.rs.done/G.rs.work):0;
-    ring.style.strokeDashoffset=String(c*(1-pr));}
-  /* 배치 중이면 시트 버튼 숨김 (확정바와 겹치지 않게) */
-  document.getElementById('mact').style.display=(TOUCH&&ghost)?'none':'';
+  if(ring){
+    const pr=G.rs?Math.min(1,G.rs.done/G.rs.work):0;
+    ring.setAttribute('width', String(G.rs?pr*100:0));   // 연구 없으면 폭 0
+  }
+  /* 건물 배지 — 무인 + 파손 수 */
+  const bad=G.bs.filter(b=>(BDEF[b.t].worker&&!b.worker)||b.hp<b.maxHp*0.6).length;
+  q('maBldgBd').textContent=bad>0?bad:'';
+  /* 배치 중에는 버튼바·조이스틱을 감춘다 — 확정바만 남겨 헷갈리지 않게 */
+  const placing=!!(TOUCH&&ghost);
+  document.getElementById('mact').style.display=placing?'none':'';
+  if(document.body)document.body.classList.toggle('placing',placing);
 }
 function renderBanner(){
   document.getElementById('banner').innerHTML=G.msgs.map(m=>`<div class="msg ${m.k}">${m.t}</div>`).join('');
@@ -2172,21 +2212,8 @@ function drawHeroTint(k,x,base,mv,ph,bob,col,alpha){
 function drawP(){
   const p=G.p, k='h_'+dir4(Math.cos(p.ang),Math.sin(p.ang));
   const base=p.y+12, mv=p.mv||0, ph=p.rp||0, bob=p.bob||0;
-  // 발밑 표식 — 어두운 바닥에서 위치를 놓치지 않게
-  ctx.save();
-  const gl=ctx.createRadialGradient(p.x,p.y+8,2,p.x,p.y+8,26);
-  gl.addColorStop(0,'rgba(232,163,23,.16)');gl.addColorStop(1,'rgba(232,163,23,0)');
-  ctx.fillStyle=gl;ctx.beginPath();ctx.ellipse(p.x,p.y+8,26,11,0,0,TAU);ctx.fill();
-  ctx.strokeStyle='rgba(232,163,23,.55)';ctx.lineWidth=1.4;
-  ctx.setLineDash([7,5]);ctx.lineDashOffset=-G.t*14;
-  ctx.beginPath();ctx.ellipse(p.x,p.y+9,15,5.6,0,0,TAU);ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.restore();
   shadow(p.x,p.y+10,13,4.5,.5);
   const hit=p.inv>0&&Math.floor(p.inv*20)%2;
-  // 림 라이트 — 실루엣을 사방으로 1.6px 밀어 밝은 테두리를 만든다
-  if(!hit)for(const [dx,dy] of [[-1.6,0],[1.6,0],[0,-1.6],[0,1.6]])
-    drawHeroTint(k,p.x+dx,base+dy,mv,ph,bob,'#FFE9BC',.5);
   if(!drawHero(k,p.x,base,mv,ph,bob,hit?.5:1)){
     ctx.fillStyle='#D8DED6';ctx.beginPath();ctx.arc(p.x,p.y,13,0,TAU);ctx.fill();
   }
@@ -2575,7 +2602,12 @@ cv.addEventListener('pointerdown',e=>{
   try{cv.setPointerCapture(e.pointerId);}catch(_){}
   if(TOUCH){
     if(ghost&&e.clientX>VW*0.42){gdrag={id:e.pointerId,x:e.clientX,y:e.clientY};return;}
-    if(!joy.act&&e.clientX<VW*0.55){joyStart(e);return;}
+    if(!joy.act){
+      const [cx,cy]=joyCenter();
+      /* 고정 조이스틱 주변(반경 110) 또는 좌하단 구역을 누르면 잡는다 */
+      if(Math.hypot(e.clientX-cx,e.clientY-cy)<110 ||
+         (e.clientX<VW*0.52 && e.clientY>VH*0.58)){ joyStart(e); return; }
+    }
     if(!ghost){const w=toWorld(e.clientX,e.clientY);tapSelect(w.x,w.y);}
     return;
   }
@@ -2617,20 +2649,27 @@ document.getElementById('pcOk').onclick=()=>{
 /* 조이스틱 */
 const joy={act:false,x:0,y:0,id:null,ox:0,oy:0};
 const joyEl=document.getElementById('joy'),knob=document.getElementById('knob');
+function joyCenter(){
+  const r=joyEl.getBoundingClientRect();
+  return [r.left+r.width/2, r.top+r.height/2];
+}
 function joyStart(e){
-  joy.act=true;joy.id=e.pointerId;joy.ox=e.clientX;joy.oy=e.clientY;joy.x=joy.y=0;
-  joyEl.style.left=e.clientX+'px';joyEl.style.top=e.clientY+'px';
-  knob.style.left='40px';knob.style.top='40px';
+  const [cx,cy]=joyCenter();
+  joy.act=true;joy.id=e.pointerId;joy.ox=cx;joy.oy=cy;
   joyEl.classList.add('on');
+  joyMove(e);
 }
 function joyMove(e){
   let dx=e.clientX-joy.ox, dy=e.clientY-joy.oy;
-  const d=Math.hypot(dx,dy),max=46;
+  const d=Math.hypot(dx,dy),max=44;
   if(d>max){dx=dx/d*max;dy=dy/d*max;}
-  knob.style.left=(40+dx)+'px';knob.style.top=(40+dy)+'px';
+  knob.style.left=(36+dx)+'px';knob.style.top=(36+dy)+'px';
   joy.x=dx/max;joy.y=dy/max;
 }
-function joyEnd(){joy.act=false;joy.id=null;joy.x=joy.y=0;joyEl.classList.remove('on');}
+function joyEnd(){
+  joy.act=false;joy.id=null;joy.x=joy.y=0;
+  knob.style.left='36px';knob.style.top='36px';
+}
 
 /* ═══════════ 사운드 ═══════════ */
 /* 햅틱 — 안드로이드 크롬에서 동작, iOS 사파리는 무시된다 */
@@ -2668,7 +2707,7 @@ requestAnimationFrame(loop);
 function applyTextures(){
   const lg=document.getElementById('logo'); if(lg)lg.src=SPR.logo.s;
   const ic=(id,k)=>{const e=document.getElementById(id);if(e&&SPR[k])e.src=SPR[k].s;};
-  ic('maBuildIc','b_tower1'); ic('maVillIc','v1'); ic('maLabIc','b_lab1');
+  ic('maBuildIc','b_tower1'); ic('maBldgIc','b_house1'); ic('maVillIc','v1'); ic('maLabIc','b_lab1');
   const r=document.documentElement.style;
   r.setProperty('--tex-metal',`url(${SPR.txMetal.s})`);
   r.setProperty('--tex-paper',`url(${SPR.txPaper.s})`);
@@ -2707,6 +2746,9 @@ function restartRun(){
 let MOB=false, sheet=null, sheetBld=null;
 function setMob(){
   MOB=TOUCH||innerWidth<760;
+  /* 홈 화면에 설치된 상태면 사파리 툴바가 없으므로 하단 여백을 줄인다 */
+  const sa=(typeof matchMedia==='function'&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+  if(document.body)document.body.classList.toggle('sa',!!sa);
   if(document.body)document.body.classList.toggle('mob',MOB);
 }
 function openSheet(kind,data){
@@ -2726,6 +2768,7 @@ function renderSheet(){
   const T=document.getElementById('shTitle'), C=document.getElementById('shContent');
   if(sheet==='build'){T.textContent='건설'; C.innerHTML=sheetBuildHTML(); wireSheetBuild(C);}
   else if(sheet==='vill'){T.textContent='마을 인원'; C.innerHTML=sheetVillHTML(); wireSheetVill(C);}
+  else if(sheet==='bldgs'){T.textContent='건물 관리'; C.innerHTML=sheetBldgsHTML(); wireSheetBldgs(C);}
   else if(sheet==='bldg'&&sheetBld){T.textContent=BDEF[sheetBld.t].n+(sheetBld.tier>1?' · '+TN[sheetBld.tier]:'');
     C.innerHTML=sheetBldgHTML(sheetBld); wireSheetBldg(C,sheetBld);}
 }
@@ -2839,6 +2882,76 @@ function wireSheetVill(C){
   });
 }
 
+/* ── 건물 관리 시트 — 전체 건물의 상태·개조·수리를 한 화면에 ── */
+function repairCost(b){return Math.ceil((b.maxHp-b.hp)*1.6);}
+function upInfo(b){
+  const d=BDEF[b.t], mt=maxTier(b.t), nx=(b.tier||1)+1;
+  if(nx>3)return {can:false,txt:'최종 단계'};
+  if(nx>mt)return {can:false,txt:`${TN[nx]} — 연구 필요`};
+  const c=Math.round((b.paid||d.cost)*(nx===2?2.2:4.6));
+  return {can:true,cost:c,nx,txt:`${TN[nx]} ${c}`};
+}
+function sheetBldgsHTML(){
+  if(!G.bs.length)return `<div class="vhead">아직 지은 건물이 없다. 아래 <b>건설</b>에서 시작하라.</div>`;
+  const dmg=G.bs.filter(b=>b.hp<b.maxHp);
+  const allRep=dmg.reduce((a,b)=>a+repairCost(b),0);
+  const idle=G.bs.filter(b=>BDEF[b.t].worker&&!b.worker).length;
+  const head=`<div class="vhead">건물 <b>${G.bs.length}</b>
+    &nbsp;무인 <b class="${idle?'bad':''}">${idle}</b>
+    &nbsp;파손 <b class="${dmg.length?'bad':''}">${dmg.length}</b>
+    &nbsp;보유 고철 <b>${Math.floor(G.scrap)}</b></div>`
+    + (dmg.length?`<button class="allrep" ${G.scrap<allRep?'disabled':''}>전체 수리 (${allRep})</button>`:'');
+  return head+G.bs.map(b=>{
+    const d=BDEF[b.t], hp=Math.max(0,b.hp/b.maxHp), u=upInfo(b);
+    const rc=repairCost(b);
+    const wk=!d.worker?'<span style="color:#8B7F66">인력 불필요</span>'
+      :(b.worker?`<span style="color:#8FA84E">${b.worker.name}</span>`
+                :'<span style="color:#C0392B">무인 — 작동 정지</span>');
+    return `<div class="gcard" data-b="${b.id}">
+      <div class="gtop">
+        <img src="${(SPR[bkey(b)]||{s:''}).s}">
+        <div class="gi">
+          <div class="gn">${d.n}${b.tier>1?` · ${TN[b.tier]}`:''}</div>
+          <div class="gw">${wk}</div>
+          <div class="ghp"><div style="width:${hp*100}%;background:${hp>.5?'#8FA84E':hp>.25?'#D8A32E':'#C0392B'}"></div></div>
+        </div>
+        <div class="gp">${Math.ceil(b.hp)}<i>/${Math.ceil(b.maxHp)}</i></div>
+      </div>
+      <div class="grow">
+        <button data-a="up" ${!u.can||G.scrap<u.cost?'disabled':''}>${u.txt}</button>
+        <button data-a="rep" ${hp>=1||G.scrap<rc?'disabled':''}>${hp>=1?'온전함':`수리 ${rc}`}</button>
+        <button data-a="del" class="warn">철거</button>
+      </div></div>`;
+  }).join('');
+}
+function wireSheetBldgs(C){
+  const all=C.querySelector? null:null;
+  C.querySelectorAll('.allrep').forEach(bt=>bt.onclick=()=>{
+    let spent=0;
+    for(const b of G.bs){ const c=repairCost(b); if(c>0&&G.scrap>=c){G.scrap-=c;b.hp=b.maxHp;spent+=c;} }
+    if(spent){say(`전체 수리 — 고철 ${spent} 소모.`,'good');sfx('build');hap(20);}
+    renderSheet();
+  });
+  C.querySelectorAll('.gcard').forEach(card=>{
+    const b=G.bs.find(x=>String(x.id)===card.dataset.b); if(!b)return;
+    card.querySelectorAll('button[data-a]').forEach(bt=>bt.onclick=()=>{
+      const a=bt.dataset.a, d=BDEF[b.t];
+      if(a==='up'){
+        const u=upInfo(b); if(!u.can||G.scrap<u.cost)return;
+        G.scrap-=u.cost;b.tier=u.nx;b.hp=b.maxHp=bMaxHp(b);
+        say(`${d.n} ${TN[u.nx]} 완료.`,'good');sfx('good');hap(25);renderSheet();return;
+      }
+      if(a==='rep'){
+        const c=repairCost(b); if(c<=0||G.scrap<c)return;
+        G.scrap-=c;b.hp=b.maxHp;sfx('build');hap(16);renderSheet();return;
+      }
+      if(a==='del'){
+        if(bt.dataset.arm!=='1'){bt.dataset.arm='1';bt.textContent='정말?';return;}
+        demolish(b);renderSheet();return;
+      }
+    });
+  });
+}
 /* ── 건물 상세 시트 (맵에서 건물을 탭) ── */
 function sheetBldgHTML(b){
   const d=BDEF[b.t], hp=Math.max(0,b.hp/b.maxHp);
@@ -2854,6 +2967,7 @@ function sheetBldgHTML(b){
         <span style="font-family:var(--mono)">${Math.ceil(b.hp)} / ${Math.ceil(b.maxHp)}</span>
       </div></div>
     <div class="gact">
+      <button data-a="all">전체 건물 관리</button>
       ${d.worker?`<button data-a="who">인원 배치 변경</button>`:''}
       ${b.t==='lab'?`<button data-a="lab">연구 열기</button>`:''}
       ${b.tier<3?(nx<=mt
@@ -2866,6 +2980,7 @@ function sheetBldgHTML(b){
 function wireSheetBldg(C,b){
   C.querySelectorAll('button[data-a]').forEach(bt=>bt.onclick=()=>{
     const a=bt.dataset.a, d=BDEF[b.t];
+    if(a==='all'){openSheet('bldgs');return;}
     if(a==='who'){openSheet('vill');return;}
     if(a==='lab'){closeSheet();toggleLab(true);return;}
     if(a==='up'){
@@ -2916,6 +3031,7 @@ if(typeof location!=='undefined'&&location.protocol&&location.protocol.startsWit
 }
 document.getElementById('maBuild').onclick=()=>{ if(sheet==='build')return closeSheet(); openSheet('build'); };
 document.getElementById('maVill').onclick =()=>{ if(sheet==='vill')return closeSheet(); openSheet('vill'); };
+document.getElementById('maBldg').onclick =()=>{ if(sheet==='bldgs')return closeSheet(); openSheet('bldgs'); };
 document.getElementById('maLab').onclick  =()=>{ if(mode==='lab')return toggleLab(false); closeSheet(); toggleLab(true); };
 document.getElementById('maPause').onclick=()=>setPause(mode!=='paused');
 document.getElementById('shClose').onclick=closeSheet;
