@@ -652,7 +652,7 @@ body.sa.mob.ingame #pconf{bottom:calc(36px + env(safe-area-inset-bottom))}
     <div class="stripe"></div>
     <img id="logo" alt="좀비 디펜스">
     <div class="sub">Z O M B I E &nbsp; D E F E N S E</div>
-    <div id="build">빌드 b14</div>
+    <div id="build">빌드 b15</div>
     <p class="story">
       셋뿐이다. <b>나</b>, <b>아내</b>, 그리고 아직 아무 일도 못 하는 <b>딸</b>.<br>
       폐허 한가운데에 코어를 세웠다. 아내는 코어에 올라 사격을 시작하고,
@@ -977,7 +977,16 @@ function saveGame(){
     vs:G.vs.map(v=>({id:v.id,name:v.name,role:v.role,sex:v.sex,apt:v.apt,
                      job:v.job==='squad'?'squad':null,manual:v.manual,hp:v.hp})),
     bs:G.bs.map(b=>({t:b.t,gx:b.gx,gy:b.gy,hp:b.hp,tier:b.tier,paid:b.paid,
-                     w:b.worker?b.worker.id:null}))};
+                     w:b.worker?b.worker.id:null})),
+    /* 위협 상태도 함께 저장한다. 이게 빠지면 새로고침 한 번으로 좀비와 둥지가 사라진다. */
+    zs:G.zs.map(z=>[z.kind,Math.round(z.x),Math.round(z.y),Math.round(z.hp)]),
+    dung:G.dung.map(o=>[Math.round(o.x),Math.round(o.y),Math.round(o.hp),Math.round(o.maxHp),
+                        +o.t.toFixed(1),+o.breakAt.toFixed(1),o.warned?1:0]),
+    dr:G.dr.map(o=>[Math.round(o.x),Math.round(o.y),o.v,o.kind||null]),
+    resc:G.rescue?{x:G.rescue.x,y:G.rescue.y,taken:G.rescue.taken,ttl:G.rescue.ttl,
+                   party:G.rescue.party,dist:G.rescue.dist,warned:G.rescue.warned}:null,
+    esc:G.esc.map(e=>({x:e.x,y:e.y,hp:e.hp,maxHp:e.maxHp,i:e.i,dead:e.dead,
+                       role:e.role,name:e.name,spr:e.spr}))};
   lsSet(SKEY,JSON.stringify(d));
 }
 const hasSave=()=>!!lsGet(SKEY);
@@ -1025,8 +1034,24 @@ function loadGameInner(d){
     G.bs.push(nb); G.grid[gk(b.gx,b.gy)]=nb;
     if(b.w!=null){const v=G.vs.find(x=>x.id===b.w); if(v){v.job=nb.id;nb.worker=v;}}
   }
+  /* 위협 상태 복원 — 없으면 새로고침이 곧 위기 초기화가 된다 */
+  G.zs=[];
+  for(const a of (d.zs||[])){
+    spawnZ(a[0],null,a[1],a[2]);
+    const z=G.zs[G.zs.length-1];
+    if(z)z.hp=Math.min(z.maxHp,a[3]);
+  }
+  G.dung=(d.dung||[]).map(a=>({id:Math.random(),x:a[0],y:a[1],hp:a[2],maxHp:a[3],
+    t:a[4],breakAt:a[5],acc:0,flash:0,warned:!!a[6]}));
+  G.dr=(d.dr||[]).map(a=>({x:a[0],y:a[1],v:a[2],kind:a[3]||undefined,t:0}));
+  G.rescue=d.resc?{x:d.resc.x,y:d.resc.y,taken:!!d.resc.taken,timer:0,
+    ttl:d.resc.ttl!==undefined?d.resc.ttl:RESCUE_TTL,party:d.resc.party||[],
+    dist:d.resc.dist||0,warned:!!d.resc.warned}:null;
+  G.esc=(d.esc||[]).map(e=>({x:e.x,y:e.y,hp:e.hp,maxHp:e.maxHp,i:e.i,dead:!!e.dead,
+    role:e.role,name:e.name,spr:e.spr}));
   G.msgs=[]; rosterSig='';
   say('저장된 마을을 이어서 시작한다.','good');
+  if(G.zs.length)say(`주변에 ${G.zs.length}마리가 남아 있다.`,'bad');
   return true;
 }
 function reset(){
@@ -1037,7 +1062,7 @@ function reset(){
     p:{x:0,y:130,hp:12,maxHp:12,cd:0,inv:0,ang:-Math.PI/2,trail:[]},
     zs:[],dr:[],sh:[],pt:[],bs:[],vs:[],esc:[],fx:[],items:[],
     buffs:{}, perks:{}, itemCd:38,
-    dung:[], nextDung:DUNG_T, dungCleared:0, dungBroke:0, finalPrep:false, won:false,
+    dung:[], nextDung:DUNG_T, dungCleared:0, dungBroke:0, finalPrep:false, won:false, overPop:0,
     grid:{}, popCapBase:7,
     spawnAcc:0, nextEvent:24, evStage:0, rescue:null, rescueDone:0, esc2:null,
     wave:0, phase:'grace', waveT:0,
@@ -1282,7 +1307,9 @@ function demolish(b){
 function bMaxHp(b){return BDEF[b.t].hp*(b.t==='wall'?(1+.6*L('wallHp')):1)*THP[Math.min(3,b.tier||1)];}
 
 /* ═══════════ 좀비 ═══════════ */
+const ZMAX=320;             // 동시 좀비 상한 (최종 웨이브는 예외)
 function spawnZ(kind,home,px,py){
+  if(G.zs.length>=ZMAX && G.phase!=='final') return;
   /* 기본은 코어 외곽. 다만 주인공이 멀리 나가 있으면 일부는 그쪽에서 생긴다 —
      넓은 맵에서 구조하러 나가는 길이 안전지대가 되지 않도록. */
   const pd=Math.hypot(G.p.x,G.p.y);
@@ -1421,6 +1448,21 @@ function update(dt){
     }
   }
 
+  /* 상한을 넘긴 인구는 머물지 못한다. 주거지를 부수거나 철거해도 사람이 남던 구멍을 막는다. */
+  if(g.vs.length>popCap()){
+    g.overPop=(g.overPop||0)+dt;
+    if(g.overPop>=10){
+      g.overPop=0;
+      const cand=g.vs.filter(v=>v.role==='worker'&&!hurtV(v));
+      if(cand.length){
+        const v=cand[cand.length-1];
+        say(`잘 곳이 없다 — ${v.name}이(가) 마을을 떠났다.`,'bad');
+        bigAlert('주거지 부족',`${v.name}이(가) 떠났다 · 인구 ${g.vs.length-1}/${popCap()}`,'bad',2.6,'✕');
+        removeV(v,true);
+      }
+    }
+  } else g.overPop=0;
+
   if(g.esc2===null&&g.t>150)escalate();
 
   /* ── 최종 국면 ──
@@ -1523,6 +1565,13 @@ function update(dt){
   p.trail.unshift({x:p.x,y:p.y});if(p.trail.length>90)p.trail.pop();
   p.maxHp=pMaxHp(); if(p.hp>p.maxHp)p.hp=p.maxHp;
   p.inv=Math.max(0,p.inv-dt);p.mf=Math.max(0,(p.mf||0)-dt*9);
+  /* 부상자 복귀 — 체력을 채워 돌려보낸다. 1로 두면 나가자마자 다시 쓰러져 무한 루프가 된다. */
+  for(const v of g.vs){
+    if(v.hurt&&v.hurt<=g.t){
+      v.hurt=0; v.maxHp=sqMaxHp(); v.hp=v.maxHp;
+      say(`${v.name}이(가) 회복해 복귀했다.`,'good');
+    }
+  }
   if(pd<coreRng())p.hp=Math.min(p.maxHp,p.hp+0.9*dt);
 
   // 조준 — 사격 대상이 있으면 그쪽을, 없으면 이동 방향을 본다
@@ -1547,7 +1596,6 @@ function update(dt){
 
   /* 코어 */
   const C=g.core; C.maxHp=coreMax(); if(C.hp>C.maxHp)C.hp=C.maxHp;
-  C.flash=Math.max(0,(C.flash||0)-dt*7);
   C.flash=Math.max(0,(C.flash||0)-dt*7);
   if(L('coreReg'))C.hp=Math.min(C.maxHp,C.hp+0.6*L('coreReg')*dt);
   C.cd-=dt;
@@ -2411,6 +2459,7 @@ function renderRoster(){
     const val=sl.value;
     if(!val){ v.job=null; v.manual=true; }
     else if(val==='squad'){
+      if(hurtV(v)){say(`${v.name}은(는) 아직 부상 중이다.`,'bad');renderRoster();return;}
       if(squad().length>=sqCap()&&v.job!=='squad'){say(`부대 정원이 찼다 (${sqCap()}명). 연구로 늘려라.`,'bad');renderRoster();return;}
       v.job='squad'; v.manual=true; if(v.x===undefined){v.x=G.p.x;v.y=G.p.y;}
     }
@@ -2507,7 +2556,9 @@ function renderSel(){
   const need=Math.ceil((b.maxHp-b.hp)*1.6);
   if(b.hp>=b.maxHp){rep.style.display='none';}
   else{rep.style.display='block';rep.textContent=`수리 (${need})`;rep.disabled=G.scrap<need;
-    rep.onclick=()=>{G.scrap-=need;b.hp=b.maxHp;sfx('build');};}
+    rep.onclick=()=>{const c=Math.ceil((b.maxHp-b.hp)*1.6);
+      if(c<=0||G.scrap<c){say('고철이 부족하다.','bad');return;}
+      G.scrap-=c;b.hp=b.maxHp;sfx('build');renderSel();};}
   document.getElementById('selDel').onclick=()=>demolish(b);
 }
 
@@ -2864,13 +2915,12 @@ function sheetBuildHTML(){
     <div class="bd">코어 체력·화력이 오른다</div></div>
     <div class="bc">${coreCost()}</div></div>`;
   return core+BKEYS.map(t=>{
-    const d=BDEF[t], lock=!G.unlock[t], cost=bCost(t);
-    const poor=G.scrap<cost;
-    return `<div class="bcard ${lock?'lock':''} ${poor?'poor':''}" data-t="${t}">
+    const d=BDEF[t], cost=bCost(t), poor=G.scrap<cost;
+    return `<div class="bcard ${poor?'poor':''}" data-t="${t}">
       <img src="${(SPR[bkey1(t)]||{s:''}).s}">
-      <div class="bi"><div class="bn">${lock?'???':d.n}</div>
-      <div class="bd">${lock?'구조 임무로 해금된다':d.d}</div></div>
-      <div class="bc">${lock?'—':cost}</div></div>`;
+      <div class="bi"><div class="bn">${d.n}</div>
+      <div class="bd">${d.d}</div></div>
+      <div class="bc">${cost}</div></div>`;
   }).join('');
 }
 function wireSheetBuild(C){
@@ -2889,7 +2939,7 @@ function wireSheetBuild(C){
 /* ── 마을(인원) 시트 ── */
 function sheetVillHTML(){
   const net=foodNet();
-  const idle=G.vs.filter(v=>v.role==='worker'&&!v.job&&!G.bs.some(b=>b.worker===v)).length;
+  const idle=G.vs.filter(v=>v.role==='worker'&&!v.job&&!G.bs.some(b=>b.worker===v)&&!hurtV(v)).length;
   const head=`<div class="vhead">인구 <b>${G.vs.length}/${popCap()}</b>
     &nbsp;탐색부대 <b>${squad().length}/${sqCap()}</b>
     &nbsp;대기 <b>${idle}</b>
@@ -2967,8 +3017,11 @@ function wireSheetVill(C){
 
 /* ── 건물 관리 시트 — 전체 건물의 상태·개조·수리를 한 화면에 ── */
 function repairCost(b){return Math.ceil((b.maxHp-b.hp)*1.6);}
+/* 상위 단계 그림이 있는 건물만 개조 대상 — 방벽은 단일 단계다 */
+const tierable=t=>!!SPR['b_'+t+'2'];
 function upInfo(b){
   const d=BDEF[b.t], mt=maxTier(b.t), nx=(b.tier||1)+1;
+  if(!tierable(b.t))return {can:false,txt:'개조 불가'};
   if(nx>3)return {can:false,txt:'최종 단계'};
   if(nx>mt)return {can:false,txt:`${TN[nx]} — 연구 필요`};
   const c=Math.round((b.paid||d.cost)*(nx===2?2.2:4.6));
@@ -3053,11 +3106,11 @@ function sheetBldgHTML(b){
       <button data-a="all">전체 건물 관리</button>
       ${d.worker?`<button data-a="who">인원 배치 변경</button>`:''}
       ${b.t==='lab'?`<button data-a="lab">연구 열기</button>`:''}
-      ${b.tier<3?(nx<=mt
+      ${(b.tier<3&&tierable(b.t))?(nx<=mt
         ?`<button data-a="up" class="gold" ${G.scrap<upCost?'disabled':''}>${TN[nx]} 개조 (${upCost})</button>`
         :`<button disabled>${TN[nx]} — 연구 필요</button>`):''}
       ${hp<1?`<button data-a="rep" ${G.scrap<need?'disabled':''}>수리 (${need})</button>`:''}
-      <button data-a="del" class="red">철거 (50% 회수)</button>
+      <button data-a="del" class="red">철거 (40% 회수)</button>
     </div>`;
 }
 function wireSheetBldg(C,b){
