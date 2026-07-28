@@ -2,7 +2,7 @@
    테스트 중에는 게임 파일을 자주 갈아끼우므로, HTML은 '네트워크 우선'으로 가져온다.
    그래야 새로 올린 버전이 바로 반영된다. 오프라인이면 캐시로 떨어진다.
    아이콘·매니페스트는 잘 안 바뀌므로 '캐시 우선'. */
-const CACHE = 'zd-v2';
+const CACHE = 'zd-v3';
 const CORE  = ['./', './index.html', './manifest.webmanifest',
                './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 

@@ -30,9 +30,11 @@
   --sans:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;background:var(--night);color:var(--paper);
-  font-family:var(--sans);-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;
-  touch-action:none;overscroll-behavior:none;-webkit-touch-callout:none;position:fixed;width:100%}
+html{height:100%;overflow:hidden}
+body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;
+  background:var(--night);color:var(--paper);font-family:var(--sans);
+  -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;
+  touch-action:none;overscroll-behavior:none;-webkit-touch-callout:none}
 canvas{display:block;position:fixed;left:0;top:0;width:100%;height:100%;
   touch-action:none;-webkit-touch-callout:none}
 
@@ -273,6 +275,7 @@ select.asg:focus{outline:1px solid var(--hazard)}
 #overStats .k{font-family:var(--mono);font-size:8px;letter-spacing:.16em;color:var(--mute);margin-top:2px}
 
 /* hazard stripe */
+#build{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:#6E6552;margin-top:6px}
 #logo{width:min(46vw,210px);image-rendering:auto;display:block;margin:0 auto 4px;
   filter:drop-shadow(0 6px 18px rgba(0,0,0,.8))}
 .stripe{height:4px;width:min(88vw,470px);
@@ -649,6 +652,7 @@ body.sa.mob.ingame #pconf{bottom:calc(36px + env(safe-area-inset-bottom))}
     <div class="stripe"></div>
     <img id="logo" alt="좀비 디펜스">
     <div class="sub">Z O M B I E &nbsp; D E F E N S E</div>
+    <div id="build">빌드 b14</div>
     <p class="story">
       셋뿐이다. <b>나</b>, <b>아내</b>, 그리고 아직 아무 일도 못 하는 <b>딸</b>.<br>
       폐허 한가운데에 코어를 세웠다. 아내는 코어에 올라 사격을 시작하고,
@@ -813,17 +817,23 @@ function sprFlash(k,x,y,sc,flip,col,alpha){
 let VW=0,VH=0,DPR=1;
 let ZOOM=1;
 const MINVIEW=700;   // 최소로 보여야 하는 월드 가로폭
+let VH_REF=0;               // 줌 기준 높이 — 툴바가 접혀도 흔들리지 않게 최대값을 쓴다
+let inputHeld=false;        // 조작 중 여부 (joy 는 아래에서 선언되므로 여기서 쓸 수 없다)
 function resize(){
   DPR=Math.min(devicePixelRatio||1,2);
-  /* iOS 사파리는 주소창 개폐로 innerHeight가 흔들린다 — visualViewport가 있으면 그쪽을 믿는다 */
+  /* iOS 사파리는 주소창 개폐로 높이가 흔들린다 — visualViewport 를 믿되, 줌은 고정한다 */
   const vv=(typeof visualViewport!=='undefined'&&visualViewport)?visualViewport:null;
   VW=Math.round(vv?vv.width:innerWidth);
   VH=Math.round(vv?vv.height:innerHeight);
   cv.width=VW*DPR;cv.height=VH*DPR;
-  /* 백업 — 스타일시트가 어떻든 표시 크기를 뷰포트에 맞춘다 */
   cv.style.width=VW+'px';cv.style.height=VH+'px';
   ctx.setTransform(DPR,0,0,DPR,0,0);
-  ZOOM=Math.min(1,Math.max(VW/MINVIEW, VH/1180));}
+  try{scrollTo(0,0);}catch(e){}                 // 혹시 밀린 스크롤을 되돌린다
+  /* 줌은 '지금까지 본 가장 큰 높이' 기준 — 주소창이 접혔다 펴져도 세계가 튀지 않는다.
+     조작 중에는 아예 건드리지 않는다. */
+  if(VH>VH_REF)VH_REF=VH;
+  if(!inputHeld)ZOOM=Math.min(1,Math.max(VW/MINVIEW, VH_REF/1180));
+}
 addEventListener('resize',resize);
 addEventListener('orientationchange',()=>setTimeout(resize,120));
 if(typeof visualViewport!=='undefined'&&visualViewport)visualViewport.addEventListener('resize',resize);
@@ -2718,7 +2728,7 @@ function joyCenter(){
 }
 function joyStart(e){
   const [cx,cy]=joyCenter();
-  joy.act=true;joy.id=e.pointerId;joy.ox=cx;joy.oy=cy;
+  joy.act=true;inputHeld=true;joy.id=e.pointerId;joy.ox=cx;joy.oy=cy;
   joyEl.classList.add('on');
   joyMove(e);
 }
@@ -2730,7 +2740,7 @@ function joyMove(e){
   joy.x=dx/max;joy.y=dy/max;
 }
 function joyEnd(){
-  joy.act=false;joy.id=null;joy.x=joy.y=0;
+  joy.act=false;inputHeld=false;joy.id=null;joy.x=joy.y=0;
   knob.style.left='36px';knob.style.top='36px';
 }
 
