@@ -1,5 +1,5 @@
 <!doctype html>
-<!--BUILD:b26-->
+<!--BUILD:b29-->
 <html lang="ko">
 <head>
 <meta charset="utf-8">
@@ -319,7 +319,8 @@ select.asg:focus{outline:1px solid var(--hazard)}
   background:rgba(10,8,5,.6);border:1px solid #4A3E2C;color:var(--mute);
   font-family:var(--mono);font-size:10px;letter-spacing:.2em;padding:8px 14px;cursor:pointer}
 #introSkip:hover{color:var(--hazard);border-color:var(--hazard)}
-.ttl{font-family:var(--mono);font-size:min(11vw,46px);letter-spacing:.16em;font-weight:800;line-height:1;
+.ttl{font-family:var(--mono);font-size:min(8.4vw,46px);letter-spacing:.16em;font-weight:800;line-height:1;
+  white-space:nowrap;   /* "테 스 트 통 과"가 폰에서 두 줄로 꺾이지 않게 */
   color:#E4DAC2;text-shadow:0 3px 0 rgba(0,0,0,.85)}
 .ttl .a{color:var(--hazard)}
 .sub{font-family:var(--mono);font-size:10px;letter-spacing:.34em;color:var(--mute);margin-top:9px}
@@ -671,7 +672,7 @@ setTimeout(function(){
    다르면 캐시를 우회하는 주소로 스스로 한 번 새로고침한다.
    (재시도 후에도 다르면 무한루프 대신 안내만 띄운다) */
 (function(){
-  var MINE='b26';
+  var MINE='b29';
   try{
     if(location.protocol.indexOf('http')!==0)return;   // 로컬 파일에선 불필요
     if(typeof fetch!=='function')return;
@@ -816,7 +817,7 @@ setTimeout(function(){
       <div id="exitNote"></div>
     </div>
     <div class="rec" id="bestRec"></div>
-    <div id="bver">빌드 b26</div>
+    <div id="bver">빌드 b29</div>
   </div>
 
   <div id="optPanel">
@@ -848,7 +849,7 @@ setTimeout(function(){
     <div id="sndTip">♪ 탭하면 소리가 켜집니다</div>
     <div id="introPlay"><div class="pb2">▶</div><div class="pc">탭하여 재생</div></div>
     <div id="introLoad">불러오는 중…</div>
-    <div id="introVer">b26</div>
+    <div id="introVer">b29</div>
     <button id="introSkip">건너뛰기 ▸</button>
   </div>
 
@@ -1373,11 +1374,11 @@ function breakDungeon(d,i){
    세 번의 파도가 정해진 간격으로 밀려온다. 추가 스폰은 없다 — 총량은 유한하고,
    전부 없애면 승리다. 파도는 전방위에서 동시에 오고, 마지막 파도는 광포화 상태다. */
 const FINAL_PULSES=[
-  {at:4,   mult:1.5, boss:2, brute:.28, msg:'제 1 파',
+  {at:4,   mult:3.0, boss:4, brute:.28, msg:'제 1 파',
    sub:'사방에서 몰려온다 — 40초 뒤 다음 파도'},
-  {at:45,  mult:2.2, boss:4, brute:.40, msg:'제 2 파',
+  {at:45,  mult:4.4, boss:8, brute:.40, msg:'제 2 파',
    sub:'더 크다 — 60초 뒤 마지막 파도'},
-  {at:105, mult:3.3, boss:6, brute:.50, msg:'마 지 막   파 도',
+  {at:105, mult:6.6, boss:12, brute:.50, msg:'마 지 막   파 도',
    sub:'광포화 — 놈들이 곧장 달려든다', enrage:true},
 ];
 function finalKind(bp){const r=Math.random();if(r<bp)return'brute';if(r<bp+.32)return'runner';return'walker';}
@@ -1417,6 +1418,7 @@ function victory(){
   lsSet(CLEARKEY,JSON.stringify({ep:1,t:Math.floor(G.t),kills:G.kills,
     pop:G.maxPop,wave:G.wave,at:Date.now()}));
   hap([0,60,50,60,50,220]);
+  const bn0=document.getElementById('banner'); if(bn0)bn0.innerHTML='';
   document.getElementById('overT').textContent='테 스 트   통 과';
   document.getElementById('overT').style.color='#E8A317';
   document.getElementById('overR').textContent=
@@ -2265,6 +2267,7 @@ function gameOver(reason){
   if(typeof closeSheet==='function')closeSheet();
   releaseInput();
   G.over=true;G.reason=reason;mode='over';
+  const bn1=document.getElementById('banner'); if(bn1)bn1.innerHTML='';
   document.getElementById('overT').textContent='마을 소멸';
   document.getElementById('overT').style.color='';
   /* 패배 화면에는 신호가 오지 않는다 */
