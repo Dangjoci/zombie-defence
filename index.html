@@ -24,7 +24,6 @@
   --blood:#C0392B;
   --paper:#DCD2BA;
   --ink:#2E2418;
-  --mute:#8B7F६6;
   --mute:#8B7F66;
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   --sans:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
@@ -245,7 +244,11 @@ select.asg:focus{outline:1px solid var(--hazard)}
   background:radial-gradient(circle at 50% 38%,rgba(26,20,14,.94),rgba(5,4,3,.99));
   pointer-events:auto;text-align:center;padding:22px}
 #over{display:none}
-.over{z-index:40}          /* 타이틀·결과 화면은 어떤 UI보다 위에 */
+.over{z-index:40;overflow-y:auto}          /* 타이틀·결과 화면은 어떤 UI보다 위에 */
+/* 내용이 화면보다 길어지면 중앙 정렬 대신 스크롤 — 위가 잘리지 않게 */
+#over{justify-content:flex-start}
+#over>:first-child{margin-top:auto}
+#over>:last-child{margin-bottom:auto}
 #start{background:
   linear-gradient(180deg,rgba(8,6,10,.30) 0%,rgba(8,6,10,.60) 46%,rgba(6,5,7,.94) 100%),
   var(--bg-city) center 42%/cover no-repeat, #0B0A08}
@@ -265,6 +268,43 @@ select.asg:focus{outline:1px solid var(--hazard)}
   box-shadow:0 3px 0 #6b4a0e,0 6px 16px rgba(0,0,0,.5);color:#221806;font-family:var(--mono);
   font-size:12px;letter-spacing:.26em;font-weight:700;cursor:pointer}
 .go:hover{background:linear-gradient(180deg,#FFC94A,#D89A1C)}
+.go:disabled{opacity:.45;cursor:default}
+.go:disabled:hover{background:linear-gradient(180deg,#F0B62E,#C98A12)}
+/* 승리 화면 — 어딘가에서 도착한 신호 */
+#nextMsg{display:none;max-width:430px;margin:0 0 18px;padding:14px 22px;text-align:center;
+  background:rgba(6,5,8,.62);border:1px solid var(--line);border-left:2px solid var(--hazard);
+  animation:sigIn .9s ease-out}
+@keyframes sigIn{from{opacity:0;transform:translateY(8px)}}
+#nextMsg .nh{font-family:var(--mono);font-size:8.5px;letter-spacing:.34em;color:var(--mute);margin-bottom:9px}
+#nextMsg .nq{font-size:13.5px;color:var(--paper);line-height:1.95}
+#nextMsg .nq b{color:var(--hazard);font-weight:700}
+
+/* ── (주)휴먼루왁 ──
+   승리 화면에만 나타나는 발신처. 신호가 잡히듯 명멸하며 떠오르고,
+   호박색으로 맥동하며, 눈은 불규칙하게 깜빡인다. 노골적으로 수상하게. */
+#luwak{display:none;flex-direction:column;align-items:center;margin:0 0 16px;opacity:0}
+#luwak.on{display:flex;animation:lkReveal 2s steps(1,end) .95s forwards}
+#luwak svg{width:min(30vw,128px);height:auto;overflow:visible;
+  animation:lkGlow 4.6s ease-in-out 3s infinite, lkGlitch 7.3s steps(1,end) 4s infinite}
+#luwak .lkStroke{fill:none;stroke:#CFC4A8;stroke-width:8;stroke-linecap:round;stroke-linejoin:round}
+#lkEyeG{transform-origin:120px 134px;transform-box:view-box;animation:lkBlink 6.8s ease-in-out 3.4s infinite}
+#luwak .lkKo{font-size:15px;font-weight:700;color:#CFC4A8;letter-spacing:.16em;margin-top:10px;
+  text-shadow:0 2px 0 rgba(0,0,0,.8)}
+#luwak .lkEn{font-family:var(--mono);font-size:7.5px;letter-spacing:.42em;color:var(--mute);margin-top:3px}
+#luwak .lkFine{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;color:#7d6f56;margin-top:10px;
+  opacity:0;animation:lkFine 1s ease-out 3.1s forwards}
+/* 수신 불량 — 켜졌다 꺼졌다를 반복하다 자리를 잡는다 */
+@keyframes lkReveal{0%{opacity:0}6%{opacity:.85}10%{opacity:.1}15%{opacity:1}
+  20%{opacity:.3}26%{opacity:.95}31%{opacity:.5}38%{opacity:1}100%{opacity:1}}
+@keyframes lkGlow{0%,100%{filter:drop-shadow(0 0 8px rgba(232,163,23,.14))}
+  50%{filter:drop-shadow(0 0 22px rgba(232,163,23,.36))}}
+/* 아주 가끔 화면이 어긋난다 */
+@keyframes lkGlitch{0%,93.4%,96.2%,100%{transform:none}
+  93.7%{transform:translateX(-4px) skewX(3deg)}94.6%{transform:translateX(3px)}95.4%{transform:translateX(-1px)}}
+/* 눈 깜빡임 — 한 번, 그리고 잠시 뒤 빠르게 두 번. 규칙이 없어 보이게 */
+@keyframes lkBlink{0%,42%,46%,68%,71.2%,74.4%,100%{transform:scaleY(1)}
+  44%{transform:scaleY(.05)}69.6%{transform:scaleY(.05)}72.8%{transform:scaleY(.05)}}
+@keyframes lkFine{to{opacity:1}}
 .btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 .go.alt{background:#1A150F;color:var(--paper);border:1px solid #4A3E2C;box-shadow:0 3px 0 #14100B}
 .go.alt:hover{background:#241C12;color:var(--hazard)}
@@ -275,7 +315,7 @@ select.asg:focus{outline:1px solid var(--hazard)}
 #overStats .k{font-family:var(--mono);font-size:8px;letter-spacing:.16em;color:var(--mute);margin-top:2px}
 
 /* hazard stripe */
-#build{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:#6E6552;margin-top:6px}
+#bver{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:#6E6552;margin-top:6px}
 #logo{width:min(46vw,210px);image-rendering:auto;display:block;margin:0 auto 4px;
   filter:drop-shadow(0 6px 18px rgba(0,0,0,.8))}
 .stripe{height:4px;width:min(88vw,470px);
@@ -574,6 +614,7 @@ body.sa.mob.ingame #pconf{bottom:calc(36px + env(safe-area-inset-bottom))}
       </div>
       <div class="sysrow">
         <button id="btnPause" class="sysbtn" title="일시정지 [P]">❚❚</button>
+        <button id="btnSnd" class="sysbtn" title="소리·진동 [M]">♪</button>
         <button id="btnRestart" class="sysbtn" title="다시 시작">↺</button>
       </div>
       <button id="labTgl">연구 [R]</button>
@@ -617,6 +658,7 @@ body.sa.mob.ingame #pconf{bottom:calc(36px + env(safe-area-inset-bottom))}
     <div class="pt">일 시 정 지</div>
     <div class="pb">
       <button id="pResume">계속하기</button>
+      <button id="pSnd">소리 끔</button>
       <button id="pRestart">다시 시작</button>
     </div>
   </div>
@@ -655,7 +697,7 @@ body.sa.mob.ingame #pconf{bottom:calc(36px + env(safe-area-inset-bottom))}
     <div class="stripe"></div>
     <img id="logo" alt="좀비 디펜스">
     <div class="sub">Z O M B I E &nbsp; D E F E N S E</div>
-    <div id="build">빌드 b17</div>
+    <div id="bver">빌드 b18</div>
     <p class="story">
       셋뿐이다. <b>나</b>, <b>아내</b>, 그리고 아직 아무 일도 못 하는 <b>딸</b>.<br>
       폐허 한가운데에 코어를 세웠다. 아내는 코어에 올라 사격을 시작하고,
@@ -685,7 +727,34 @@ body.sa.mob.ingame #pconf{bottom:calc(36px + env(safe-area-inset-bottom))}
       <div><div class="v num" id="oPop">0</div><div class="k">최대 인구</div></div>
       <div><div class="v num" id="oWave">0</div><div class="k">웨이브</div></div>
     </div>
-    <button class="go" id="btnRetry">다시 시작</button>
+    <div id="luwak">
+      <svg viewBox="0 0 240 236" aria-hidden="true">
+        <g class="lkStroke">
+          <path d="M120 40 L228 213 L12 213 Z"/>
+          <line x1="85" y1="9" x2="97" y2="27"/>
+          <line x1="120" y1="3" x2="120" y2="25"/>
+          <line x1="155" y1="9" x2="143" y2="27"/>
+          <g id="lkEyeG">
+            <path d="M56 134 Q120 96 184 134 Q120 172 56 134 Z"/>
+            <ellipse cx="120" cy="134" rx="21" ry="32"/>
+            <path d="M112 105 Q132 120 116 134 Q103 150 125 163"/>
+          </g>
+        </g>
+      </svg>
+      <div class="lkKo">(주) 휴먼루왁</div>
+      <div class="lkEn">H U M A N&nbsp;&nbsp;&nbsp;L U W A K</div>
+      <div class="lkFine">본 테스트 의뢰처 · 생존 데이터 전송 완료</div>
+    </div>
+    <div id="nextMsg">
+      <div class="nh">― 수신 신호 ―</div>
+      <div class="nq">테스트를 통과하셨습니다.</div>
+      <div class="nq"><b>본 게임</b>에 진입하시겠습니까?</div>
+    </div>
+    <div class="btns">
+      <button class="go" id="btnNext">진 입</button>
+      <button class="go alt" id="btnRetry">다시 시작</button>
+    </div>
+    <div class="rec" id="nextNote"></div>
   </div>
 </div>
 
@@ -964,6 +1033,13 @@ function newVillager(role,name,sex){
   return v;
 }
 const SKEY='lastcore_save_v3', BKEY='lastcore_best_v2';
+/* ── 시리즈 연결 ──
+   이 판은 1화이자 입장 테스트다. 최종 공세를 넘긴 기록(CLEARKEY)이 기기에 남고,
+   본 게임(같은 세계관 1인칭 FPS)은 이 열쇠가 있어야 입장을 허가한다.
+   본 게임이 준비되면 NEXT_GAME_URL 만 채우면 된다 — 비어 있으면 '연결 대기' 안내가 뜬다.
+   (본 게임 쪽 확인 예시: JSON.parse(localStorage.getItem('lastcore_clear')||'null')?.ep===1) */
+const NEXT_GAME_URL='';
+const CLEARKEY='lastcore_clear';
 function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
@@ -977,15 +1053,18 @@ function saveGame(){
     unlock:G.unlock, popCapBase:G.popCapBase, starve:G.starve, ruins:G.ruins,
     buffs:G.buffs, perks:G.perks, itemCd:G.itemCd,
     nextDung:G.nextDung, dungCleared:G.dungCleared, dungBroke:G.dungBroke, finalPrep:G.finalPrep,
+    finalPulse:G.finalPulse, ovlSaid:G.ovlSaid,
     vs:G.vs.map(v=>({id:v.id,name:v.name,role:v.role,sex:v.sex,apt:v.apt,
-                     job:v.job==='squad'?'squad':null,manual:v.manual,hp:v.hp})),
+                     job:v.job==='squad'?'squad':null,manual:v.manual,hp:v.hp,hurt:v.hurt||0})),
     bs:G.bs.map(b=>({t:b.t,gx:b.gx,gy:b.gy,hp:b.hp,tier:b.tier,paid:b.paid,
                      w:b.worker?b.worker.id:null})),
     /* 위협 상태도 함께 저장한다. 이게 빠지면 새로고침 한 번으로 좀비와 둥지가 사라진다. */
-    zs:G.zs.map(z=>[z.kind,Math.round(z.x),Math.round(z.y),Math.round(z.hp)]),
+    zs:G.zs.map(z=>[z.kind,Math.round(z.x),Math.round(z.y),Math.round(z.hp),z.enr?1:0]),
+    /* 바닥에 남은 아이템도 저장한다 — 둥지 보상(영구 강화)이 새로고침으로 사라지면 안 된다 */
+    items:G.items.map(it=>[Math.round(it.x),Math.round(it.y),it.k,it.perm?1:0,Math.round(it.life)]),
     dung:G.dung.map(o=>[Math.round(o.x),Math.round(o.y),Math.round(o.hp),Math.round(o.maxHp),
                         +o.t.toFixed(1),+o.breakAt.toFixed(1),o.warned?1:0]),
-    dr:G.dr.map(o=>[Math.round(o.x),Math.round(o.y),o.v,o.kind||null]),
+    dr:G.dr.map(o=>[Math.round(o.x),Math.round(o.y),o.v,o.kind||null,Math.round(o.life||26)]),
     resc:G.rescue?{x:G.rescue.x,y:G.rescue.y,taken:G.rescue.taken,ttl:G.rescue.ttl,
                    party:G.rescue.party,dist:G.rescue.dist,warned:G.rescue.warned}:null,
     esc:G.esc.map(e=>({x:e.x,y:e.y,hp:e.hp,maxHp:e.maxHp,i:e.i,dead:e.dead,
@@ -1012,8 +1091,12 @@ function loadGameInner(d){
   reset();
   for(const k of ['t','scrap','food','kills','maxPop','R','rs','wave','phase','waveT',
                   'esc2','nextEvent','rescueDone','evStage','unlock','popCapBase','starve',
-                  'buffs','perks','itemCd','nextDung','dungCleared','dungBroke','finalPrep'])
+                  'buffs','perks','itemCd','nextDung','dungCleared','dungBroke','finalPrep',
+                  'finalPulse','ovlSaid'])
     if(d[k]!==undefined)G[k]=d[k];
+  /* 구버전 세이브가 최종 국면 도중이라면, 이미 지난 파도는 다시 쏟아내지 않는다 */
+  if(G.phase==='final'&&d.finalPulse===undefined)
+    G.finalPulse=FINAL_PULSES.filter(P=>G.t-FINAL_T>=P.at).length;
   if(d.ruins&&d.ruins.length)G.ruins=d.ruins;
   G.core.hp=d.core.hp; G.core.lvl=d.core.lvl;
   G.p.x=d.p.x; G.p.y=d.p.y; G.p.hp=d.p.hp;
@@ -1022,7 +1105,8 @@ function loadGameInner(d){
     if(v.role==='worker'){
       o.apt=v.apt||rollApt(o.sex);
       o.maxHp=sqMaxHp(); o.hp=Math.min(v.hp||o.maxHp,o.maxHp);
-      if(v.job==='squad'){o.job='squad';o.x=G.p.x;o.y=G.p.y;}
+      if(v.hurt&&v.hurt>d.t)o.hurt=v.hurt;   // 부상은 저장을 넘어도 이어진다
+      if(v.job==='squad'&&!o.hurt){o.job='squad';o.x=G.p.x;o.y=G.p.y;}
     }
     return o;
   });
@@ -1042,11 +1126,15 @@ function loadGameInner(d){
   for(const a of (d.zs||[])){
     spawnZ(a[0],null,a[1],a[2]);
     const z=G.zs[G.zs.length-1];
-    if(z)z.hp=Math.min(z.maxHp,a[3]);
+    if(z){z.hp=Math.min(z.maxHp,a[3]); if(a[4])enrage(z);}
   }
   G.dung=(d.dung||[]).map(a=>({id:Math.random(),x:a[0],y:a[1],hp:a[2],maxHp:a[3],
     t:a[4],breakAt:a[5],acc:0,flash:0,warned:!!a[6]}));
-  G.dr=(d.dr||[]).map(a=>({x:a[0],y:a[1],v:a[2],kind:a[3]||undefined,t:0}));
+  /* life/bob 을 복원하지 않으면 NaN 이 되어 드랍이 보이지 않게 된다 */
+  G.dr=(d.dr||[]).map(a=>({x:a[0],y:a[1],v:a[2],kind:a[3]||undefined,
+    life:a[4]!==undefined?a[4]:26,bob:rnd(0,TAU)}));
+  G.items=(d.items||[]).filter(a=>ITEMS[a[2]]).map(a=>({x:a[0],y:a[1],k:a[2],
+    perm:!!a[3],life:a[4]!==undefined?a[4]:60,bob:rnd(0,TAU)}));
   G.rescue=d.resc?{x:d.resc.x,y:d.resc.y,taken:!!d.resc.taken,timer:0,
     ttl:d.resc.ttl!==undefined?d.resc.ttl:RESCUE_TTL,party:d.resc.party||[],
     dist:d.resc.dist||0,warned:!!d.resc.warned}:null;
@@ -1065,7 +1153,7 @@ function reset(){
     p:{x:0,y:130,hp:12,maxHp:12,cd:0,inv:0,ang:-Math.PI/2,trail:[]},
     zs:[],dr:[],sh:[],pt:[],bs:[],vs:[],esc:[],fx:[],items:[],
     buffs:{}, perks:{}, itemCd:38,
-    dung:[], nextDung:DUNG_T, dungCleared:0, dungBroke:0, finalPrep:false, won:false, overPop:0,
+    dung:[], nextDung:DUNG_T, dungCleared:0, dungBroke:0, finalPrep:false, finalPulse:0, ovlSaid:false, won:false, overPop:0,
     grid:{}, popCapBase:7,
     spawnAcc:0, nextEvent:24, evStage:0, rescue:null, rescueDone:0, esc2:null,
     wave:0, phase:'grace', waveT:0,
@@ -1110,7 +1198,7 @@ const wEff=w=>Math.min(w,WCAP)+Math.max(0,w-WCAP)*0.22;
 const waveRate =w=>1.6+0.26*(wEff(w)-1);            // 공세 중 지속 스폰
 const waveBurst=w=>Math.round(Math.min(52,3+1.3*(wEff(w)-1))); // 웨이브 시작 시 몰려오는 무리
 const waveHp   =w=>1+0.135*(wEff(w)-1);
-const waveSpd  =w=>1+0.012*(w-1);
+const waveSpd  =w=>1+0.012*(wEff(w)-1);
 /* ── 던전 ──
    먼 곳에 좀비가 뭉치는 둥지가 생긴다. 시간이 다 되면 터져서 쌓인 것들이 한꺼번에 몰려온다.
    터지기 전에 찾아가 부수면 영구 강화를 준다. 20분 이후의 압박은 전부 여기서 온다. */
@@ -1146,29 +1234,72 @@ function breakDungeon(d,i){
   say(`둥지가 터졌다 — ${n+extra}마리가 몰려온다.`,'bad');
   bigAlert('둥 지 붕 괴',`${n+extra}마리가 마을로 향한다`,'bad',3.4,'☠');
 }
+/* ── 최종 공세 ──
+   세 번의 파도가 정해진 간격으로 밀려온다. 추가 스폰은 없다 — 총량은 유한하고,
+   전부 없애면 승리다. 파도는 전방위에서 동시에 오고, 마지막 파도는 광포화 상태다. */
+const FINAL_PULSES=[
+  {at:4,   mult:1.5, boss:2, brute:.28, msg:'제 1 파',
+   sub:'사방에서 몰려온다 — 40초 뒤 다음 파도'},
+  {at:45,  mult:2.2, boss:4, brute:.40, msg:'제 2 파',
+   sub:'더 크다 — 60초 뒤 마지막 파도'},
+  {at:105, mult:3.3, boss:6, brute:.50, msg:'마 지 막   파 도',
+   sub:'광포화 — 놈들이 곧장 달려든다', enrage:true},
+];
+function finalKind(bp){const r=Math.random();if(r<bp)return'brute';if(r<bp+.32)return'runner';return'walker';}
+function enrage(z){
+  if(!z||z.enr)return;
+  z.enr=true; z.spd*=1.25; z.sdmg*=1.5;
+  if(z.kind!=='boss')z.hunt=true;   // 배회 없이 곧장 사람과 코어로
+}
+function firePulse(i){
+  const P=FINAL_PULSES[i], w=WV(), n=Math.round(waveBurst(w)*P.mult);
+  const dirs=10;   // 방위각을 균등 분배 — 한쪽 방벽만으로는 버틸 수 없다
+  for(let k=0;k<n;k++){
+    const a=((k%dirs)/dirs)*TAU+rnd(-.17,.17), r=rnd(1060,1400);
+    spawnZ(finalKind(P.brute),null,Math.cos(a)*r,Math.sin(a)*r);
+    if(P.enrage)enrage(G.zs[G.zs.length-1]);
+  }
+  for(let b=0;b<P.boss;b++){
+    const a=(b/P.boss)*TAU+rnd(-.3,.3);
+    spawnZ('boss',null,Math.cos(a)*1240,Math.sin(a)*1240);
+    if(P.enrage)enrage(G.zs[G.zs.length-1]);
+  }
+  say(`${P.msg.replace(/ /g,'')} — ${n+P.boss}마리.`,'bad');
+  bigAlert(P.msg,P.sub,'bad',3.4,'☠');
+  shake(11); sfx('boss'); hap([0,120,60,160]);
+}
 function startFinalWave(){
-  const w=G.wave;
-  say('최종 웨이브 — 전부 쓸어버려라.','bad');
-  bigAlert('최 종 웨 이 브','남은 것을 모두 없애면 끝난다','bad',4.2,'☠');
-  const n=Math.round(waveBurst(w)*2.3);
-  for(let i=0;i<n;i++)spawnZ(pickKind());
-  for(let i=0;i<4;i++)spawnZ('boss');
+  say('최종 공세 — 파도는 세 번. 전부 쓸어버려라.','bad');
+  bigAlert('최 종 공 세','파도는 세 번 — 전부 없애면 끝난다','bad',4.2,'☠');
   shake(14); sfx('boss'); hap([0,140,60,140,60,200]);
 }
 function victory(){
   if(typeof closeSheet==='function')closeSheet();
-  G.over=true; G.won=true; G.reason='마을이 살아남았다'; mode='over';
+  G.over=true; G.won=true; G.reason='테스트 통과'; mode='over';
   lsDel(SKEY);
   if(G.t>bestTime())lsSet(BKEY,String(Math.floor(G.t)));
+  /* 클리어 열쇠 — 본 게임이 입장 자격을 확인하는 기록. 버튼을 누르지 않아도 남는다. */
+  lsSet(CLEARKEY,JSON.stringify({ep:1,t:Math.floor(G.t),kills:G.kills,
+    pop:G.maxPop,wave:G.wave,at:Date.now()}));
   hap([0,60,50,60,50,220]);
-  document.getElementById('overT').textContent='생 존';
+  document.getElementById('overT').textContent='테 스 트   통 과';
   document.getElementById('overT').style.color='#E8A317';
   document.getElementById('overR').textContent=
-    `30분을 버텨냈다 · 생존자 ${G.vs.length}명`;
+    `세 번의 파도를 모두 막아냈다 · 생존자 ${G.vs.length}명`;
   document.getElementById('oTime').textContent=fmt(G.t);
   document.getElementById('oKill').textContent=G.kills;
   document.getElementById('oPop').textContent=G.maxPop;
   document.getElementById('oWave').textContent=G.wave;
+  /* 어딘가에서 온 신호 — 이 판이 '테스트'였음이 여기서 처음 드러난다 */
+  document.getElementById('luwak').classList.remove('on');
+  void document.getElementById('luwak').offsetWidth;   // 애니메이션 재시작
+  document.getElementById('luwak').classList.add('on');
+  setTimeout(()=>{if(mode==='over'&&G&&G.won){sfx('event');hap(30);}},1150);
+  document.getElementById('nextMsg').style.display='block';
+  const bn=document.getElementById('btnNext');
+  bn.style.display=''; bn.disabled=false; bn.textContent='진 입';
+  document.getElementById('btnRetry').classList.add('alt');
+  document.getElementById('nextNote').textContent='';
   document.getElementById('over').style.display='flex';
   sfx('good');
 }
@@ -1211,6 +1342,15 @@ const coreMax=()=>160+52*L('coreHp')+60*(G.core.lvl-1);
 const popCap =()=>G.popCapBase+G.bs.filter(b=>b.t==='house').reduce((s,b)=>s+(2+L('houseCap'))*(b.tier),0);
 const eatRate=()=>0.078*Math.pow(0.88,L('eat'));
 const hasWife=()=>G.vs.some(v=>v.role==='wife');
+/* 받침에 따른 조사 — "민수이(가)" 같은 병기를 없앤다 */
+const _bat=n=>{const c=n.charCodeAt(n.length-1);return c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28>0;};
+const iga=n=>n+(_bat(n)?'이':'가');
+const eulreul=n=>n+(_bat(n)?'을':'를');
+/* 방탄 장갑 — 첫 장은 절반, 그 뒤로는 장당 25%씩만 더 준다.
+   영구 강화가 겹쳐도 무적이 되지 않게 하는 감쇠. */
+const guardMul=()=>{const n=itemK('guard');return n<=0?1:0.5*Math.pow(0.75,n-1);};
+/* 최종 대비 소강(29~30분) 동안은 수리비 절반 — 마지막 정비를 밀어준다 */
+const repDisc=()=>(G.finalPrep&&G.phase!=='final')?0.5:1;
 
 /* ═══════════ 메시지 ═══════════ */
 let alertT=0;
@@ -1237,6 +1377,8 @@ function mhud(){
   q('mTime').textContent=fmt(G.t);
   const w=q('mWave');
   if(G.phase==='grace'){w.textContent='정착';w.className='';}
+  else if(G.phase==='final'){w.textContent='최종';w.className='hot';}
+  else if(G.finalPrep){w.textContent='대비';w.className='';}
   else if(G.phase==='assault'){w.textContent='웨이브 '+G.wave;w.className='hot';}
   else{w.textContent='소강';w.className='';}
   const cr=Math.max(0,G.core.hp/G.core.maxHp), hr=Math.max(0,G.p.hp/pMaxHp());
@@ -1247,10 +1389,12 @@ function mhud(){
   const pe=q('mprep');
   if(G.finalPrep&&G.phase!=='final'){
     pe.className='on';
-    pe.textContent=`최종 웨이브까지 ${Math.max(0,Math.ceil(FINAL_T-G.t))}초 — 준비하세요`;
+    pe.textContent=`최종 공세까지 ${Math.max(0,Math.ceil(FINAL_T-G.t))}초 — 수리 반값`;
   } else if(G.phase==='final'){
     pe.className='on';
-    pe.textContent=`최종 웨이브 · 남은 적 ${G.zs.length}`;
+    pe.textContent = G.finalPulse<FINAL_PULSES.length
+      ? `최종 공세 · 적 ${G.zs.length} · 다음 파도 ${Math.max(0,Math.ceil(FINAL_T+FINAL_PULSES[G.finalPulse].at-G.t))}초`
+      : `마지막 파도 · 남은 적 ${G.zs.length}`;
   } else if(G.rescue&&!G.rescue.taken){
     pe.className='on';
     pe.textContent=`구조 신호 — ${Math.max(0,Math.ceil(G.rescue.ttl))}초 · ${Math.round(dist(G.p.x,G.p.y,G.rescue.x,G.rescue.y))}m`;
@@ -1423,7 +1567,8 @@ function update(dt){
   /* 해금 타임라인 */
 
   /* 이벤트 */
-  if(!g.rescue && g.t>=g.nextEvent && g.phase!=='assault') triggerRescue();
+  /* 최종 국면(대비 소강 포함)에는 새 구조 신호가 오지 않는다 — 마지막 1분은 온전히 방어의 시간 */
+  if(!g.rescue && g.t>=g.nextEvent && g.phase!=='assault' && !g.finalPrep) triggerRescue();
   if(g.rescue){
     g.rescue.timer+=dt;
     if(!g.rescue.taken){
@@ -1461,8 +1606,8 @@ function update(dt){
       const cand=g.vs.filter(v=>v.role==='worker'&&!hurtV(v));
       if(cand.length){
         const v=cand[cand.length-1];
-        say(`잘 곳이 없다 — ${v.name}이(가) 마을을 떠났다.`,'bad');
-        bigAlert('주거지 부족',`${v.name}이(가) 떠났다 · 인구 ${g.vs.length-1}/${popCap()}`,'bad',2.6,'✕');
+        say(`잘 곳이 없다 — ${iga(v.name)} 마을을 떠났다.`,'bad');
+        bigAlert('주거지 부족',`${iga(v.name)} 떠났다 · 인구 ${g.vs.length-1}/${popCap()}`,'bad',2.6,'✕');
         removeV(v,true);
       }
     }
@@ -1475,15 +1620,27 @@ function update(dt){
      최종 웨이브는 추가 스폰이 없다 — 몰려온 것을 전부 없애면 클리어. */
   if(g.esc2!==null&&!g.finalPrep&&g.phase!=='final'&&g.t>=PREP_T){
     g.finalPrep=true; g.phase='lull'; g.waveT=0;
-    for(let i=g.dung.length-1;i>=0;i--){burst(g.dung[i].x,g.dung[i].y,'#E8A317',20);g.dung.splice(i,1);}
-    say('무전이 끊겼다. 마지막이 온다 — 준비하라.','bad');
-    bigAlert('마지막 웨이브를 준비하세요',`${Math.round(FINAL_T-g.t)}초 뒤 최종 공세`,'',5.2,'!');
+    /* 진압 중이던 둥지는 진행분만큼 고철로 되돌려준다 — 나갔던 노력이 증발하지 않게 */
+    let refund=0;
+    for(let i=g.dung.length-1;i>=0;i--){
+      const D=g.dung[i];
+      refund+=Math.round(70*(1-Math.max(0,D.hp)/D.maxHp));
+      burst(D.x,D.y,'#E8A317',20); g.dung.splice(i,1);
+    }
+    if(refund>0){g.scrap+=refund; say(`둥지 진압 진행분 회수 — 고철 ${refund}.`,'good');}
+    say('무전이 끊겼다. 마지막이 온다 — 준비하라. 지금은 수리비가 절반이다.','bad');
+    bigAlert('최종 공세를 준비하세요',`${Math.round(FINAL_T-g.t)}초 뒤 시작 · 지금 수리는 반값`,'',5.2,'!');
     sfx('event'); hap([0,120,80,120]);
   }
   if(g.finalPrep&&g.phase!=='final'&&g.t>=FINAL_T){
-    g.phase='final'; g.wave++; startFinalWave();
+    g.phase='final'; g.wave++; g.finalPulse=0; startFinalWave();
   }
-  if(g.phase==='final'&&g.zs.length===0){ victory(); return; }
+  if(g.phase==='final'){
+    const ft=g.t-FINAL_T;
+    while(g.finalPulse<FINAL_PULSES.length && ft>=FINAL_PULSES[g.finalPulse].at)
+      firePulse(g.finalPulse++);
+    if(g.finalPulse>=FINAL_PULSES.length && g.zs.length===0){ victory(); return; }
+  }
 
   /* 웨이브 — 공세와 소강 */
   if(g.esc2!==null&&!g.finalPrep&&g.phase!=='final'){
@@ -1574,7 +1731,7 @@ function update(dt){
   for(const v of g.vs){
     if(v.hurt&&v.hurt<=g.t){
       v.hurt=0; v.maxHp=sqMaxHp(); v.hp=v.maxHp;
-      say(`${v.name}이(가) 회복해 복귀했다.`,'good');
+      say(`${iga(v.name)} 회복해 복귀했다.`,'good');
     }
   }
   if(pd<coreRng())p.hp=Math.min(p.maxHp,p.hp+0.9*dt);
@@ -1604,9 +1761,17 @@ function update(dt){
   C.flash=Math.max(0,(C.flash||0)-dt*7);
   if(L('coreReg'))C.hp=Math.min(C.maxHp,C.hp+0.6*L('coreReg')*dt);
   C.cd-=dt;
+  /* 최종 국면의 벼랑 끝 — 코어가 25% 아래로 떨어지면 안전장치를 풀고 한계 출력으로 쏜다 */
+  const ovl=g.phase==='final'&&C.hp<C.maxHp*0.25;
+  if(ovl&&!g.ovlSaid){
+    g.ovlSaid=true;
+    say('코어 과부하 — 안전장치 해제. 한계 출력으로 사격한다.','good');
+    bigAlert('코어 과부하','안전장치 해제 · 연사 +80%','good',2.8,'⚡');
+    sfx('good'); hap([0,60,40,60]);
+  }
   if(C.cd<=0){
     const tg=nearestZ(0,0,coreRng());
-    if(tg){C.cd=hasWife()?0.62:0.95;
+    if(tg){C.cd=(hasWife()?0.62:0.95)*(ovl?0.55:1);
       const a=Math.atan2(tg.y,tg.x);C.flash=1;C.fa=a;
       g.sh.push({x:0,y:0,vx:Math.cos(a)*720,vy:Math.sin(a)*720,dmg:coreAtk(),life:.7,c:'#4FD1C5',r:5});}
   }
@@ -1641,7 +1806,13 @@ function update(dt){
     if(pw>0){
       g.rs.done+=pw*dt;
       if(g.rs.done>=g.rs.work){
-        G.R[g.rs.k]++;
+        const key=g.rs.k;
+        /* 강화 방벽 — 기존 방벽도 현재 체력 비율을 유지한 채 함께 튼튼해진다 */
+        if(key==='wallHp')for(const b of G.bs)if(b.t==='wall')b._r=b.hp/b.maxHp;
+        G.R[key]++;
+        if(key==='wallHp')for(const b of G.bs)if(b.t==='wall'){
+          b.maxHp=bMaxHp(b); b.hp=b.maxHp*(b._r||1); delete b._r;
+        }
         say(`연구 완료 — ${g.rs.name}`,'good'); sfx('good');
         g.rs=null; refreshBuildCosts();
       }
@@ -1670,7 +1841,7 @@ function update(dt){
         const R=105, near=dist(z.x,z.y,p.x,p.y)<R+120||Math.hypot(z.x,z.y)<R+180;
         g.fx.push({x:z.x,y:z.y,r:10,max:R,life:.55});
         if(near){shake(8); sfx('boss'); hap([0,60,40,60]);}
-        if(dist(z.x,z.y,p.x,p.y)<R&&p.inv<=0){p.inv=.85;p.hp-=z.dmg*0.7*Math.pow(0.5,itemK('guard'));
+        if(dist(z.x,z.y,p.x,p.y)<R&&p.inv<=0){p.inv=.85;p.hp-=z.dmg*0.7*guardMul();
           if(p.hp<=0){gameOver('거대 개체의 일격에 쓰러졌다.');return;}}
         if(Math.hypot(z.x,z.y)<R+62)C.hp-=z.sdmg*0.9;
         for(const bb of g.bs)if(dist(z.x,z.y,bb.x,bb.y)<R){bb.hp-=z.sdmg*0.9;bb.flash=1;
@@ -1691,7 +1862,7 @@ function update(dt){
         let sp2=z.spd*(tObj==='idle'?0.45:1);
         z.x+=Math.cos(a2)*sp2*dt; z.y+=Math.sin(a2)*sp2*dt;
         if(tObj==='p'&&dp<15+z.r&&z.cd<=0&&p.inv<=0){
-          z.cd=.9;p.inv=.75;p.hp-=z.dmg*Math.pow(0.5,itemK('guard'));shake(6);sfx('hurt');hap(45);
+          z.cd=.9;p.inv=.75;p.hp-=z.dmg*guardMul();shake(6);sfx('hurt');hap(45);
           if(p.hp<=0){gameOver('생존자가 쓰러졌다.');return;}}
         continue;
       }
@@ -1711,7 +1882,7 @@ function update(dt){
     const hit=blockAt(nx,ny,z.r);
     if(hit){
       if(z.cd<=0){z.cd=1;hit.hp-=z.sdmg;hit.flash=1;
-        if(hit.hp<=0){burst(hit.x,hit.y,'#7a6a52',16);demolishSilent(hit);say(`${BDEF[hit.t].n}이(가) 무너졌다.`,'bad');}}
+        if(hit.hp<=0){burst(hit.x,hit.y,'#7a6a52',16);demolishSilent(hit);say(`${iga(BDEF[hit.t].n)} 무너졌다.`,'bad');}}
       // 슬라이드
       const sx=blockAt(z.x+Math.cos(a)*sp*dt,z.y,z.r), sy=blockAt(z.x,z.y+Math.sin(a)*sp*dt,z.r);
       if(!sx)z.x+=Math.cos(a)*sp*dt*.6; else if(!sy)z.y+=Math.sin(a)*sp*dt*.6;
@@ -1722,7 +1893,7 @@ function update(dt){
       if(Math.hypot(z.x,z.y)<62+z.r&&z.cd<=0){z.cd=1;C.hp-=z.sdmg;shake(4);
         if(C.hp<=0){gameOver('코어가 무너졌다.');return;}}
     } else if(tObj==='p'){
-      if(dp<15+z.r&&z.cd<=0&&p.inv<=0){z.cd=.9;p.inv=.75;p.hp-=z.dmg*Math.pow(0.5,itemK('guard'));shake(6);sfx('hurt');hap(45);
+      if(dp<15+z.r&&z.cd<=0&&p.inv<=0){z.cd=.9;p.inv=.75;p.hp-=z.dmg*guardMul();shake(6);sfx('hurt');hap(45);
         if(p.hp<=0){gameOver('생존자가 쓰러졌다.');return;}}
     } else {
       const e=tObj;
@@ -1733,7 +1904,7 @@ function update(dt){
             burst(e.x,e.y,'#B03A2E',14); hap(60);
             e.job=null; e.manual=false; e.hurt=G.t+45; e.hp=1;
             e.x=undefined; e.y=undefined;
-            say(`${e.name}이(가) 부상당해 후송됐다. (45초)`,'bad');
+            say(`${iga(e.name)} 부상당해 후송됐다. (45초)`,'bad');
             bigAlert('대원 부상',`${e.name} · 45초 후 복귀`,'bad',2.2);
           } else if(!e.dead){
             e.dead=true;burst(e.x,e.y,'#B03A2E',14);say('호송 중인 생존자가 당했다.','bad');
@@ -1953,7 +2124,7 @@ function removeV(v,starved){
   if(v.role==='hero')return;
   const b=G.bs.find(b=>b.worker===v); if(b)b.worker=null;
   G.vs.splice(G.vs.indexOf(v),1);
-  say(starved?`${v.name}이(가) 굶주림으로 쓰러졌다.`:`${v.name}을(를) 마을 밖으로 내보냈다.`,'bad');
+  say(starved?`${iga(v.name)} 굶주림으로 쓰러졌다.`:`${eulreul(v.name)} 마을 밖으로 내보냈다.`,'bad');
 }
 function gameOver(reason){
   if(typeof closeSheet==='function')closeSheet();
@@ -1961,6 +2132,12 @@ function gameOver(reason){
   G.over=true;G.reason=reason;mode='over';
   document.getElementById('overT').textContent='마을 소멸';
   document.getElementById('overT').style.color='';
+  /* 패배 화면에는 신호가 오지 않는다 */
+  document.getElementById('luwak').classList.remove('on');
+  document.getElementById('nextMsg').style.display='none';
+  document.getElementById('btnNext').style.display='none';
+  document.getElementById('btnRetry').classList.remove('alt');
+  document.getElementById('nextNote').textContent='';
   lsDel(SKEY);                                   // 한 판이 끝나면 이어하기는 사라진다
   if(G.t>bestTime())lsSet(BKEY,String(Math.floor(G.t)));
   hap([0,90,60,140]);
@@ -2148,6 +2325,14 @@ function draw(){
   const vg=ctx.createRadialGradient(VW/2,VH/2,Math.min(VW,VH)*.35,VW/2,VH/2,Math.max(VW,VH)*.72);
   vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.62)');
   ctx.fillStyle=vg;ctx.fillRect(0,0,VW,VH);
+  /* 최종 국면 — 하늘이 핏빛으로 맥동한다. 파도가 거듭될수록 짙어진다. */
+  if(g.phase==='final'){
+    const pu=Math.sin(g.t*2.6)*.5+.5;
+    const fv=ctx.createRadialGradient(VW/2,VH/2,Math.min(VW,VH)*.30,VW/2,VH/2,Math.max(VW,VH)*.75);
+    fv.addColorStop(0,'rgba(140,20,14,0)');
+    fv.addColorStop(1,'rgba(140,20,14,'+(0.10+0.07*pu+0.05*Math.min(3,g.finalPulse))+')');
+    ctx.fillStyle=fv;ctx.fillRect(0,0,VW,VH);
+  }
   if(g.p.inv>0.3){ctx.fillStyle='rgba(176,58,46,'+(g.p.inv-0.3)*.5+')';ctx.fillRect(0,0,VW,VH);}
 }
 function arrow(wx,wy,col,label){
@@ -2270,6 +2455,13 @@ function drawZ(z){
     ctx.fillStyle='#82A83E';ctx.beginPath();ctx.arc(z.x,z.y,z.r,0,TAU);ctx.fill();
   }
   if(z.flash>0)sprFlash(k,z.x,base,sc,flip,'#FFF6EB',z.flash);
+  if(z.enr){   // 광포화 — 붉게 달아오른 채 달려온다
+    ctx.save();ctx.globalCompositeOperation='lighter';
+    const pu=Math.sin(G.t*6+z.wob)*.5+.5;
+    ctx.fillStyle='rgba(210,50,30,'+(0.09+0.10*pu)+')';
+    ctx.beginPath();ctx.arc(z.x,z.y-z.r*.35,z.r+7,0,TAU);ctx.fill();
+    ctx.restore();
+  }
   if(z.kind==='boss'||z.kind==='brute'){
     const w=z.r*2, hp=Math.max(0,z.hp/z.maxHp);
     ctx.fillStyle='rgba(0,0,0,.75)';ctx.fillRect(z.x-w/2,base-SZ(k).h*sc-7,w,4);
@@ -2408,9 +2600,14 @@ function hud(dt){
   document.getElementById('clock').className='panel'+(g.esc2===null?' calm':g.phase!=='lull'?'':isLongLull()?' lull long':' lull');
   const wph=g.phase;
   document.getElementById('sWave').textContent = g.esc2===null ? '정착 단계'
+    : wph==='final' ? `최종 공세 · 남은 적 ${g.zs.length}`
+    : g.finalPrep ? `최종 공세까지 ${Math.max(0,Math.ceil(FINAL_T-g.t))}초`
     : 'WAVE '+String(g.wave).padStart(2,'0')+(wph==='assault'?' · 공세':isLongLull()?' · 긴 소강':' · 소강');
   document.getElementById('phaseFill').style.transform=
-    'scaleX('+(g.esc2===null?0:clamp(g.waveT/(wph==='assault'?ASSAULT:lullDur(g.wave)),0,1))+')';
+    'scaleX('+(g.esc2===null?0
+      : wph==='final'?1
+      : g.finalPrep?clamp((g.t-PREP_T)/(FINAL_T-PREP_T),0,1)
+      : clamp(g.waveT/(wph==='assault'?ASSAULT:lullDur(g.wave)),0,1))+')';
   const ch=clamp(g.core.hp/g.core.maxHp,0,1),ph=clamp(g.p.hp/g.p.maxHp,0,1);
   document.getElementById('coreFill').style.transform='scaleX('+ch+')';
   document.getElementById('hpFill').style.transform='scaleX('+ph+')';
@@ -2425,6 +2622,14 @@ function hud(dt){
       const e=g.esc.find(x=>!x.dead);
       ob.innerHTML=`호송 중 — 코어까지 <b>${e?Math.round(Math.hypot(e.x,e.y)):0}m</b>`;
     } else ob.innerHTML=`구조 신호 — <b>${Math.round(dist(g.p.x,g.p.y,g.rescue.x,g.rescue.y))}m</b>`;
+  } else if(g.phase==='final'){
+    ob.className='on';
+    ob.innerHTML = g.finalPulse<FINAL_PULSES.length
+      ? `남은 적 <b>${g.zs.length}</b> · 다음 파도 <b>${Math.max(0,Math.ceil(FINAL_T+FINAL_PULSES[g.finalPulse].at-g.t))}초</b>`
+      : `마지막 파도 — 남은 적 <b>${g.zs.length}</b>`;
+  } else if(g.finalPrep){
+    ob.className='on';
+    ob.innerHTML=`최종 공세까지 <b>${Math.max(0,Math.ceil(FINAL_T-g.t))}초</b> · 수리 반값`;
   } else ob.className='';
   renderRoster(); refreshBuildCosts();
   if(selObj)renderSel();
@@ -2483,13 +2688,15 @@ function renderRoster(){
     rosterSig='';
   });
   el.querySelectorAll('.drop').forEach(btn=>btn.onclick=()=>{
+    const v0=G.vs.find(v=>String(v.id)===btn.dataset.v);
     if(btn.dataset.arm!=='1'){
-      btn.dataset.arm='1';btn.textContent='정말?';
+      btn.dataset.arm='1';
+      /* 아내와 아이는 대가를 알려준다 — 아내가 떠나면 코어 화력이 준다 */
+      btn.textContent=v0&&v0.role==='wife'?'코어 화력↓ 정말?':v0&&v0.role==='child'?'아이를? 정말?':'정말?';
       setTimeout(()=>{if(btn.isConnected){btn.dataset.arm='0';btn.textContent='버리기';}},2600);
       return;
     }
-    const v=G.vs.find(v=>String(v.id)===btn.dataset.v);
-    if(v)removeV(v,false);
+    if(v0)removeV(v0,false);
   });
 }
 function coreCost(){return Math.round(100*Math.pow(1.68,G.core.lvl-1));}
@@ -2566,10 +2773,10 @@ function renderSel(){
     };
   }
   const rep=document.getElementById('selRep');
-  const need=Math.ceil((b.maxHp-b.hp)*1.6);
+  const need=repairCost(b);
   if(b.hp>=b.maxHp){rep.style.display='none';}
   else{rep.style.display='block';rep.textContent=`수리 (${need})`;rep.disabled=G.scrap<need;
-    rep.onclick=()=>{const c=Math.ceil((b.maxHp-b.hp)*1.6);
+    rep.onclick=()=>{const c=repairCost(b);
       if(c<=0||G.scrap<c){say('고철이 부족하다.','bad');return;}
       G.scrap-=c;b.hp=b.maxHp;sfx('build');renderSel();};}
   document.getElementById('selDel').onclick=()=>demolish(b);
@@ -2669,6 +2876,7 @@ addEventListener('keydown',e=>{
   if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();
   if(mode==='menu'||mode==='over')return;
   if(k==='p'){setPause(mode!=='paused');return;}
+  if(k==='m'){setSnd(!SND);return;}
   if(mode==='paused'&&k!=='escape')return;
   if(k==='r'){toggleLab();return;}
   if(k==='escape'){selBuild=null;ghost=null;syncPconf();selObj=null;document.getElementById('sel').style.display='none';
@@ -2809,12 +3017,22 @@ function joyEnd(){
 }
 
 /* ═══════════ 사운드 ═══════════ */
+/* 음소거 — 소리와 진동을 한 번에 끈다. 설정은 기기에 남는다. */
+let SND=lsGet('lastcore_snd')!=='0';
+function setSnd(v){
+  SND=!!v; lsSet('lastcore_snd',SND?'1':'0');
+  const b=document.getElementById('btnSnd');
+  if(b){b.textContent=SND?'♪':'✕';b.classList.toggle('on',!SND);b.title=SND?'소리·진동 끄기 [M]':'소리·진동 켜기 [M]';}
+  const p=document.getElementById('pSnd');
+  if(p)p.textContent=SND?'소리 끔':'소리 켬';
+}
 /* 햅틱 — 안드로이드 크롬에서 동작, iOS 사파리는 무시된다 */
 let HAP=true;
-function hap(ms){try{if(HAP&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
+function hap(ms){try{if(SND&&HAP&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
 let AC=null;
 function sfx(k){
   try{
+    if(!SND)return;
     if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();
     const o=AC.createOscillator(),g=AC.createGain();
     const cfg={shot:[520,.03,.028,'square'],pick:[880,.05,.02,'sine'],build:[300,.13,.06,'triangle'],
@@ -2860,7 +3078,8 @@ function refreshStartScreen(){
   const c=document.getElementById('btnCont'), rec=document.getElementById('bestRec');
   c.style.display=hasSave()?'':'none';
   const b=bestTime();
-  rec.textContent=b?`최고 기록  ${fmt(b)}`:'';
+  let cleared=null; try{cleared=JSON.parse(lsGet(CLEARKEY)||'null');}catch(e){}
+  rec.textContent=(cleared?'✓ 테스트 통과   ':'')+(b?`최고 기록  ${fmt(b)}`:'');
 }
 let paused=false;
 function setPause(v){
@@ -3018,7 +3237,9 @@ function wireSheetVill(C){
           e.stopPropagation();
           const v2=G.vs.find(x=>String(x.id)===card.dataset.v); if(!v2)return;
           if(bt.dataset.a==='drop'){
-            if(bt.dataset.arm!=='1'){bt.dataset.arm='1';bt.textContent='정말 버리나?';return;}
+            if(bt.dataset.arm!=='1'){bt.dataset.arm='1';
+              bt.textContent=v2.role==='wife'?'코어 화력이 준다 — 정말?':v2.role==='child'?'아이를 정말 버리나?':'정말 버리나?';
+              return;}
             removeV(v2,false); renderSheet(); return;
           }
           assignV(v2,bt.dataset.a); hap(16); renderSheet();
@@ -3029,7 +3250,7 @@ function wireSheetVill(C){
 }
 
 /* ── 건물 관리 시트 — 전체 건물의 상태·개조·수리를 한 화면에 ── */
-function repairCost(b){return Math.ceil((b.maxHp-b.hp)*1.6);}
+function repairCost(b){return Math.ceil((b.maxHp-b.hp)*1.6*repDisc());}
 /* 상위 단계 그림이 있는 건물만 개조 대상 — 방벽은 단일 단계다 */
 const tierable=t=>!!SPR['b_'+t+'2'];
 function upInfo(b){
@@ -3106,7 +3327,7 @@ function sheetBldgHTML(b){
   const d=BDEF[b.t], hp=Math.max(0,b.hp/b.maxHp);
   const mt=maxTier(b.t), nx=(b.tier||1)+1;
   const upCost=Math.round((b.paid||d.cost)*(nx===2?2.2:4.6));
-  const need=Math.ceil((b.maxHp-b.hp)*1.6);
+  const need=repairCost(b);
   const wk=b.worker?`배치: <b style="color:#8FA84E">${b.worker.name}</b>`
     :(d.worker?'<b style="color:#C0392B">무인 — 사람을 배치해야 작동한다</b>':'');
   return `<div style="display:flex;gap:12px;align-items:center">
@@ -3139,7 +3360,7 @@ function wireSheetBldg(C,b){
       say(`${d.n} ${TN[nx]} 완료.`,'good');sfx('good');hap(25);renderSheet();return;
     }
     if(a==='rep'){
-      const need=Math.ceil((b.maxHp-b.hp)*1.6);
+      const need=repairCost(b);
       if(G.scrap<need)return;
       G.scrap-=need;b.hp=b.maxHp;sfx('build');hap(16);renderSheet();return;
     }
@@ -3167,12 +3388,24 @@ document.getElementById('btnRetry').onclick=()=>{
   document.getElementById('start').style.display='flex';
   refreshStartScreen();
 };
+/* '진입' — 동의하면 같은 세계관의 본 게임(1인칭)으로 이어진다 */
+document.getElementById('btnNext').onclick=()=>{
+  sfx('good'); hap([0,40,30,140]);
+  if(NEXT_GAME_URL){ location.href=NEXT_GAME_URL; return; }
+  const bn=document.getElementById('btnNext');
+  bn.disabled=true; bn.textContent='연 결   대 기';
+  document.getElementById('nextNote').textContent=
+    '신호가 아직 약합니다 — 통과 기록은 저장되었습니다. 문이 열리면 이곳에서 이어집니다.';
+};
 refreshStartScreen();
 /* 앱이 가려지거나 닫힐 때 반드시 저장 */
 addEventListener('pagehide',saveGame);
 addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveGame();});
 document.getElementById('btnPause').onclick=()=>setPause(mode!=='paused');
 document.getElementById('btnRestart').onclick=()=>setPause(true);
+document.getElementById('btnSnd').onclick=()=>setSnd(!SND);
+document.getElementById('pSnd').onclick=()=>setSnd(!SND);
+setSnd(SND);
 document.getElementById('pResume').onclick=()=>setPause(false);
 document.getElementById('pRestart').onclick=restartRun;
 document.getElementById('labClose').onclick=()=>toggleLab(false);
