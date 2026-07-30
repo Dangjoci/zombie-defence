@@ -1079,8 +1079,8 @@ const APT_N={tower:'사격',farm:'농사',lab:'연구',squad:'탐색'};
 /* 아이템 — 좀비가 드물게 떨구는 건 30초짜리 맛보기, 던전 보상은 판이 끝날 때까지 영구. */
 const ITEM_SEC=30;
 const ITEMS={
-  atk:  {n:'강화 탄약',  d:'공격력 +70%',     c:'#E8A317', ic:'▲'},
-  spd:  {n:'전투 각성제',d:'공격속도 +80%',   c:'#C0392B', ic:'≡'},
+  atk:  {n:'강화 탄약',  d:'공격력 +70%',     c:'#E8A317', ic:'▲', f:'증평막걸리의 알콜 기운이 단전에서 솟구친다.'},
+  spd:  {n:'전투 각성제',d:'공격속도 +80%',   c:'#C0392B', ic:'≡', f:'천연 카페인의 각성효과가 온몸을 감싼다'},
   move: {n:'경량 장구',  d:'이동속도 +45%',   c:'#8FA84E', ic:'»'},
   multi:{n:'산탄 개조',  d:'탄환 +2발',       c:'#D08A3C', ic:'✳'},
   pick: {n:'자력 수집기',d:'습득 반경 +160%', c:'#5FC9BE', ic:'◎'},
@@ -1347,11 +1347,11 @@ function breakDungeon(d,i){
    세 번의 파도가 정해진 간격으로 밀려온다. 추가 스폰은 없다 — 총량은 유한하고,
    전부 없애면 승리다. 파도는 전방위에서 동시에 오고, 마지막 파도는 광포화 상태다. */
 const FINAL_PULSES=[
-  {at:4,   mult:1.5, boss:2, brute:.28, msg:'제 1 파',
+  {at:4,   mult:4.5, boss:6,  brute:.28, msg:'제 1 파',
    sub:'사방에서 몰려온다 — 40초 뒤 다음 파도'},
-  {at:45,  mult:2.2, boss:4, brute:.40, msg:'제 2 파',
+  {at:45,  mult:6.6, boss:12, brute:.40, msg:'제 2 파',
    sub:'더 크다 — 60초 뒤 마지막 파도'},
-  {at:105, mult:3.3, boss:6, brute:.50, msg:'마 지 막   파 도',
+  {at:105, mult:9.9, boss:18, brute:.50, msg:'마 지 막   파 도',
    sub:'광포화 — 놈들이 곧장 달려든다', enrage:true},
 ];
 function finalKind(bp){const r=Math.random();if(r<bp)return'brute';if(r<bp+.32)return'runner';return'walker';}
@@ -2131,13 +2131,16 @@ function dropItem(x,y,perm){
   return k;
 }
 function grabItem(it){
+  const I=ITEMS[it.k];
   if(it.perm){
     G.perks[it.k]=(G.perks[it.k]||0)+1;
-    bigAlert('영구 강화 획득',`${ITEMS[it.k].n} — ${ITEMS[it.k].d}`,'',3.0,'★');
-    say(`${ITEMS[it.k].n} 영구 획득.`,'good');
+    bigAlert('영구 강화 획득',`${I.n} — ${I.d}`+(I.f?`<br><i>${I.f}</i>`:''),'',3.0,'★');
+    say(`${I.n} 영구 획득.`,'good');
+    if(I.f)say(I.f,'good');
   } else {
     G.buffs[it.k]=G.t+ITEM_SEC;
-    say(`${ITEMS[it.k].n} — ${ITEMS[it.k].d} (${ITEM_SEC}초)`,'good');
+    say(`${I.n} — ${I.d} (${ITEM_SEC}초)`,'good');
+    if(I.f)say(I.f,'good');
   }
   sfx('good'); hap(25);
 }
