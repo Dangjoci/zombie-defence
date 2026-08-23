@@ -1780,7 +1780,16 @@ function deliverRescue(){
   if(!joined.length){
     say('데려오지 못했다. 내가 늦었어.','bad','hero');
   } else {
-    for(const v of joined) say(joinLine(v),'good',null,pfHTML(v,'pic'));
+    const names=new Set(joined.map(v=>v.name));
+    if(names.has('종호')||names.has('진화')){
+      const v=joined.find(x=>x.name==='종호')||{name:'종호',role:'worker',sex:'m'};
+      say('역시, 여기까지 오면 구하러 올 줄 알았지!','good',null,pfHTML(v,'pic'));
+    } else if(names.has('종면')||names.has('미래')){
+      const v=joined.find(x=>x.name==='종면')||{name:'종면',role:'worker',sex:'m'};
+      say('형! 살아있었구나! 장비 좀 챙기느라 늦었어.','good',null,pfHTML(v,'pic'));
+    } else {
+      for(const v of joined) say(joinLine(v),'good',null,pfHTML(v,'pic'));
+    }
   }
   if(G.rescueDone>=2)escalate();
   G.nextEvent=G.t+rnd(13,19);
