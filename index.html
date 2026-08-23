@@ -1203,13 +1203,22 @@ function pickName(pool){
   return src[ri(0,src.length-1)];
 }
 const FIXED_SEX={'종호':'m','진화':'f','종면':'m','미래':'f'};
+const FIXED_APT={'종호':'squad','진화':'tower','종면':'lab','미래':'farm'};
+function lockApt(kind){
+  const apt={tower:0.72,farm:0.72,lab:0.72,squad:0.72};
+  apt[kind]=1.72;
+  return apt;
+}
 function newVillager(role,name,sex){
   if(!sex) sex = name&&FIXED_SEX[name] ? FIXED_SEX[name]
     : role==='wife'?'f' : role==='hero'?'m' : (Math.random()<.5?'m':'f');
   const nm = name || (role==='wife'?'아내' : role==='child'?pickName(KIDS)
              : pickName(sex==='f'?FEMALE:MALE));
   const v={id:Math.random(), name:nm, role, sex, job:null, manual:false};
-  if(role==='worker'){ v.apt=rollApt(sex); v.hp=v.maxHp=14; }
+  if(role==='worker'){
+    v.apt = (nm&&FIXED_APT[nm]) ? lockApt(FIXED_APT[nm]) : rollApt(sex);
+    v.hp=v.maxHp=14;
+  }
   return v;
 }
 const SKEY='lastcore_save_v3', BKEY='lastcore_best_v2';
