@@ -451,14 +451,15 @@ body.mob.ingame #mhud{display:flex;position:absolute;left:0;right:0;top:0;z-inde
   border:1px solid #0A0806;box-shadow:inset 0 0 0 1px rgba(110,92,64,.4);
   text-shadow:0 1px 0 rgba(255,246,220,.35)}
 .chip b.bad{color:#E26A1A;animation:blink 1s steps(2) infinite}
-#mclock{margin-left:auto;flex:none;text-align:right;pointer-events:auto;padding:3px 9px;
+#mclock{margin-left:auto;flex:none;display:inline-flex;align-items:baseline;gap:4px;
+  pointer-events:auto;padding:5px 10px;
   background-image:var(--tex-metal);background-color:#16120D;border:1px solid #0A0806;
   box-shadow:inset 0 0 0 1px rgba(158,136,98,.15),0 2px 5px rgba(0,0,0,.55)}
-#mclock b{display:block;font-family:var(--mono);font-size:14px;font-weight:800;line-height:1.15;
+#mclock b{display:inline-block;font-family:var(--mono);font-size:14px;font-weight:800;line-height:1.15;
   color:#7E2418;background-image:var(--tex-paper);background-color:#CDC2A6;
-  padding:0 7px;border:1px solid #0A0806;box-shadow:inset 0 0 0 1px rgba(110,92,64,.4);
-  text-shadow:0 1px 0 rgba(255,246,220,.3)}
-#mclock span{font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;color:#8B7F66}
+  padding:0 6px;border:1px solid #0A0806;box-shadow:inset 0 0 0 1px rgba(110,92,64,.4);
+  text-shadow:0 1px 0 rgba(255,246,220,.35)}
+#mclock span{font-style:normal;font-size:9.5px;color:#A2957A;letter-spacing:.04em;order:-1}
 #mclock span.hot{color:var(--blood)}
 /* 상태바 — 화면을 가로지르지 않게 절반씩 나눠 나란히 둔다 */
 #mbars{display:flex;gap:10px;align-items:center}
