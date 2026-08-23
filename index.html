@@ -1372,7 +1372,7 @@ function loadGameInner(d){
     dist:d.resc.dist||0,warned:!!d.resc.warned}:null;
   G.esc=(d.esc||[]).map(e=>({x:e.x,y:e.y,hp:e.hp,maxHp:e.maxHp,i:e.i,dead:!!e.dead,
     role:e.role,name:e.name,spr:e.spr}));
-  G.msgs=[]; rosterSig='';
+  G.msgs=[]; G.sayQ=[]; G.sayWait=0; rosterSig='';
   say('여보, 다시 여기야. 이어서 간다.','good','hero');
   if(G.zs.length)say(`아직 밖에 ${G.zs.length}마리가 있어. 조심해.`,'bad','hero');
   return true;
@@ -1390,7 +1390,7 @@ function reset(){
     spawnAcc:0, nextEvent:24, evStage:0, rescue:null, rescueDone:0, esc2:null,
     wave:0, phase:'grace', waveT:0,
     unlock:{core:true,tower:true,farm:true,house:true,wall:true,lab:true},   // 처음부터 전부 건설 가능
-    R:{}, starve:0, msgs:[]
+    R:{}, starve:0, msgs:[], sayQ:[], sayWait:0
   };
   G.vs=[newVillager('hero','나'),newVillager('wife','아내'),newVillager('child','딸')];
   G.vs[1].job='core';
@@ -1621,8 +1621,23 @@ function bannerName(m){
   return speakerName(m&&m.who);
 }
 function say(t,k,who,face){
-  G.msgs.push({t,k:k||'',life:4.2,who:who||null,face:face||''});
+  if(!G)return;
+  if(!G.sayQ)G.sayQ=[];
+  G.sayQ.push({t,k:k||'',life:5.2,who:who||null,face:face||''});
+  if(!(G.sayWait>0)) tickSay(0);
+}
+function tickSay(dt){
+  if(!G)return;
+  if(!G.sayQ)G.sayQ=[];
+  if(G.sayWait>0){
+    G.sayWait-=dt||0;
+    if(G.sayWait>0)return;
+  }
+  if(!G.sayQ.length){G.sayWait=0;return;}
+  const m=G.sayQ.shift();
+  G.msgs.push(m);
   if(G.msgs.length>4)G.msgs.shift();
+  G.sayWait=G.sayQ.length?1.35:0;
   renderBanner();
 }
 
@@ -3465,6 +3480,7 @@ function loop(now){
   const dt=Math.min(.05,(now-last)/1000);last=now;
   /* 게임이 실제로 진행 중일 때만 조작 UI를 노출한다 (타이틀·결과 화면 보호) */
   if(document.body)document.body.classList.toggle('ingame', !!(G&&!G.over&&mode!=='menu'));
+  if(G)tickSay(dt);
   if(mode==='play'&&G&&!G.over){update(dt);hud(dt);}
   else if(mode==='paused'&&G)hud(dt);
   if(G)mhud();
