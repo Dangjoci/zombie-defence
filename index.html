@@ -189,7 +189,7 @@ select.asg:focus{outline:1px solid var(--hazard)}
   box-shadow:0 2px 5px rgba(0,0,0,.55),inset 0 0 0 1px rgba(110,92,64,.35);
   animation:slide .3s ease-out}
 .msg .pic,.msg .vface{width:34px;height:34px;flex:none;object-fit:cover;object-position:50% 12%;
-  border:1px solid #0A0806;image-rendering:pixelated}
+  border:1px solid #0A0806;image-rendering:pixelated;--pfs:34px}
 .msg .col{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .msg .nm{font-size:9px;font-weight:800;letter-spacing:.08em;color:#6A4E36;line-height:1.1}
 .msg span.tx{flex:1;min-width:0}
@@ -641,6 +641,7 @@ body.sa.mob.ingame #pconf{bottom:calc(36px + env(safe-area-inset-bottom))}
 .vr2 .vface{--pfs:24px}
 #alert .pic{--pfs:46px}
 span.vface,span.pic{display:inline-block}
+span.pic{--pfs:34px}
 .at{background-image:var(--pf-atlas);background-repeat:no-repeat;image-rendering:pixelated;
   background-size:calc(var(--pfs)*10) calc(var(--pfs)*6);
   background-position:calc(var(--pfc)*var(--pfs)*-1) calc(var(--pfr)*var(--pfs)*-1)}
@@ -1603,7 +1604,10 @@ function speakerV(who){
   if(who==='child')return (G&&G.vs&&G.vs.find(v=>v.role==='child'&&v.name==='딸'))||{role:'child',name:'딸'};
   if(who==='hero'||who==='나'||who==='주인공'||!who)return heroV();
   if(G&&G.vs){const v=G.vs.find(x=>x.name===who); if(v)return v;}
-  return {role:'worker',name:String(who)};
+  const name=String(who);
+  const role=KIDS.includes(name)?'child':'worker';
+  const sex=FIXED_SEX[name]||(FEMALE.includes(name)||KIDS.includes(name)?'f':MALE.includes(name)?'m':'f');
+  return {role,name,sex};
 }
 function speakerName(who){
   if(!who||who==='hero'||who==='나'||who==='주인공')return '';
