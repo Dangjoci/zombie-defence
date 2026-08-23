@@ -983,6 +983,26 @@ function silhouette(k,col){
   g.fillStyle=col;g.fillRect(0,0,c.width,c.height);
   return FCACHE[id]=c;
 }
+function bloodSpr(k){
+  const id='bld|'+k; if(FCACHE[id])return FCACHE[id];
+  const im=IMG[k]; if(!im||!im.complete||!im.naturalWidth)return null;
+  const c=document.createElement('canvas');
+  c.width=im.naturalWidth;c.height=im.naturalHeight;
+  const g=c.getContext('2d');
+  g.drawImage(im,0,0);
+  g.globalCompositeOperation='source-in';
+  const grd=g.createLinearGradient(0,c.height*0.18,0,c.height*0.92);
+  grd.addColorStop(0,'rgba(132,18,14,0.10)');
+  grd.addColorStop(0.38,'rgba(118,12,12,0.34)');
+  grd.addColorStop(1,'rgba(72,8,8,0.16)');
+  g.fillStyle=grd; g.fillRect(0,0,c.width,c.height);
+  g.globalCompositeOperation='source-atop';
+  g.fillStyle='rgba(96,8,8,0.48)';
+  g.beginPath(); g.ellipse(c.width*0.52,c.height*0.26,c.width*0.20,c.height*0.07,0.15,0,Math.PI*2); g.fill();
+  g.beginPath(); g.ellipse(c.width*0.36,c.height*0.50,c.width*0.16,c.height*0.11,-0.4,0,Math.PI*2); g.fill();
+  g.beginPath(); g.ellipse(c.width*0.62,c.height*0.58,c.width*0.11,c.height*0.08,0.6,0,Math.PI*2); g.fill();
+  return FCACHE[id]=c;
+}
 function sprFlash(k,x,y,sc,flip,col,alpha){
   const c=silhouette(k,col||'#fff'); if(!c)return;
   const S=SZ(k),w=S.w*(sc||1),h=S.h*(sc||1);
@@ -2616,6 +2636,15 @@ function drawZ(z){
   shadow(z.x,base-1,z.r*.85,z.r*.3,.45);
   if(!spr(k,z.x,base,sc,flip)){
     ctx.fillStyle='#82A83E';ctx.beginPath();ctx.arc(z.x,z.y,z.r,0,TAU);ctx.fill();
+  } else {
+    const b=bloodSpr(k);
+    if(b){
+      const S=SZ(k),w=S.w*sc,h=S.h*sc;
+      ctx.save(); ctx.imageSmoothingEnabled=false;
+      ctx.translate(z.x,base); if(flip)ctx.scale(-1,1);
+      ctx.drawImage(b,-w/2,-h,w,h);
+      ctx.restore();
+    }
   }
   if(z.flash>0)sprFlash(k,z.x,base,sc,flip,'#FFF6EB',z.flash);
   if(z.enr){   // 광포화 — 붉게 달아오른 채 달려온다
