@@ -2725,11 +2725,11 @@ function drawZ(z){
   }
 }
 const ESC_SC=1.15;
-const SQ_M=['v0','v3','v5'], SQ_F=['v1','v2','v4'];
+const SQ_M=['v5','v3'], SQ_F=['v0','v1','v2','v4'];
 function bodyKey(v){
   const n=v.name||'', h=[...n].reduce((a,c)=>a+c.charCodeAt(0),0);
   if(v.role==='child'||n==='딸') return (v.sex==='f'||n==='딸')?'kidg':(h%2?'kid1':'kid0');
-  if(n==='종호')return 'v0'; if(n==='종면')return 'v3';
+  if(n==='종호')return 'v5'; if(n==='종면')return 'v3';
   if(n==='진화')return 'v1'; if(n==='미래')return 'v2';
   const pool=v.sex==='f'?SQ_F:SQ_M;
   return pool[h%pool.length];
