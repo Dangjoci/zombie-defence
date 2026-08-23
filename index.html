@@ -1838,6 +1838,7 @@ function deliverRescue(){
     if(names.has('종호')||names.has('진화')){
       const v=joined.find(x=>x.name==='종호')||{name:'종호',role:'worker',sex:'m'};
       say('역시, 여기까지 오면 구하러 올 줄 알았지!','good',v.name||'종호',pfHTML(v,'pic'));
+      say('먼길 오느라 고생했다 쫑호','good','hero');
     } else if(names.has('종면')||names.has('미래')){
       const v=joined.find(x=>x.name==='종면')||{name:'종면',role:'worker',sex:'m'};
       say('형! 살아있었구나! 장비 좀 챙기느라 늦었어.','good',v.name||'종면',pfHTML(v,'pic'));
