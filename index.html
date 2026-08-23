@@ -645,7 +645,7 @@ span.vface,span.pic{display:inline-block}
   background-position:calc(var(--pfc)*var(--pfs)*-1) calc(var(--pfr)*var(--pfs)*-1)}
 
 /* ── 시네마틱 인트로: 재난문자 → 트레일러 → 타이틀 ── */
-#cine{display:none;position:fixed;inset:0;z-index:200;background:#050403;align-items:center;justify-content:center;transition:opacity .55s;pointer-events:auto}
+#cine{display:flex;position:fixed;inset:0;z-index:200;background:#050403;align-items:center;justify-content:center;transition:opacity .55s;pointer-events:auto}
 #cine.out{opacity:0;pointer-events:none}
 #cAlert{display:none;width:min(88vw,360px);user-select:none;cursor:pointer;
   animation:cin .45s cubic-bezier(.2,1.4,.4,1) both,cshake .5s .5s steps(2) 3}
@@ -690,7 +690,7 @@ span.vface,span.pic{display:inline-block}
         <div class="cf">발신 : 국가재난안전본부&nbsp;&nbsp;&nbsp;긴급재난문자 2026-07-25 12:00</div>
       </div>
     </div>
-    <video id="cVid" muted playsinline webkit-playsinline preload="none"></video>
+    <video id="cVid" src="intro.mp4?v=90" muted autoplay playsinline webkit-playsinline preload="auto"></video>
     <div id="cBtns"><button id="cSnd">🔇 소리 켜기</button><button id="cSkip">건너뛰기 ▸</button></div>
   </div>
   <audio id="bgm" loop preload="auto" playsinline>
@@ -700,9 +700,43 @@ span.vface,span.pic{display:inline-block}
 
 <script>
 (function(){
-  /* 인트로 영상은 잠시 빼 둔다. 새 파일을 받으면 #cVid src만 다시 넣으면 된다. */
   var cine=document.getElementById('cine');
-  if(cine) cine.style.display='none';
+  var vid=document.getElementById('cVid');
+  var skip=document.getElementById('cSkip');
+  var snd=document.getElementById('cSnd');
+  if(!cine||!vid)return;
+  var done=false;
+  function endCine(){
+    if(done)return; done=true;
+    try{vid.pause();}catch(e){}
+    cine.classList.add('out');
+    setTimeout(function(){ cine.style.display='none'; }, 560);
+    try{ if(window.unlockBgm) window.unlockBgm(); }catch(e){}
+  }
+  vid.addEventListener('ended', endCine);
+  vid.addEventListener('error', function(){ endCine(); });
+  function bindSkip(el){
+    if(!el)return;
+    var f=function(e){ e.preventDefault(); e.stopPropagation(); endCine(); };
+    el.addEventListener('pointerup', f);
+    el.addEventListener('click', f);
+  }
+  bindSkip(skip);
+  if(snd){
+    snd.textContent='🔇 소리 켜기';
+    snd.addEventListener('pointerup', function(e){
+      e.preventDefault(); e.stopPropagation();
+      vid.muted=!vid.muted;
+      snd.textContent=vid.muted?'🔇 소리 켜기':'🔊 소리 끄기';
+      vid.play().catch(function(){});
+    });
+  }
+  function tryPlay(){ vid.play().catch(function(){}); }
+  tryPlay();
+  cine.addEventListener('pointerup', function(e){
+    if(e.target===snd || (snd && snd.contains(e.target))) return;
+    if(vid.paused) tryPlay();
+  });
 })();
 </script>
 <canvas id="cv"></canvas>
