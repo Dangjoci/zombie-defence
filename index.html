@@ -2632,6 +2632,24 @@ function draw(){
     ctx.fillRect(q.x-q.r/2,q.y-q.r/2,q.r,q.r);}
   ctx.globalAlpha=1;
 
+  // 건설 가능칸 격자 — 배치 중일 때만, 화면 안 놓을 수 있는 칸
+  if(selBuild&&selBuild!=='core'){
+    const gx0=Math.floor(l/CELL), gx1=Math.floor(r/CELL);
+    const gy0=Math.floor(t/CELL), gy1=Math.floor(b/CELL);
+    ctx.save();
+    ctx.lineWidth=1;
+    for(let gy=gy0;gy<=gy1;gy++){
+      for(let gx=gx0;gx<=gx1;gx++){
+        if(!canPlace(gx,gy))continue;
+        const x=gx*CELL, y=gy*CELL;
+        ctx.fillStyle='rgba(232,163,23,.11)';
+        ctx.fillRect(x+1,y+1,CELL-2,CELL-2);
+        ctx.strokeStyle='rgba(232,163,23,.48)';
+        ctx.strokeRect(x+1.5,y+1.5,CELL-3,CELL-3);
+      }
+    }
+    ctx.restore();
+  }
   // 배치 고스트
   if(selBuild&&selBuild!=='core'){
     const pw=ghost?ghost:{x:mouse.wx,y:mouse.wy};
