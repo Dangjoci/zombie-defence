@@ -19,9 +19,9 @@
   --line:#453B2C;
   --hazard:#E8A317;
   --hazard-dim:#8a6420;
-  --infect:#8FA84E;
+  --infect:#C9A24A;
   --core:#5FC9BE;
-  --blood:#C0392B;
+  --blood:#E26A1A;
   --paper:#DCD2BA;
   --ink:#2E2418;
   --mute:#8B7F66;
@@ -270,8 +270,8 @@ select.asg:focus{outline:1px solid var(--hazard)}
 #over .btns{width:min(92vw,420px);gap:8px}
 #over .go{flex:1;padding:12px 10px;font-size:11px}
 #over .rec{margin-top:6px}
-#start{justify-content:flex-end;padding:0;background:
-  url('assets/title-bg.png') center center/cover no-repeat, #0B0A08}
+#start{justify-content:center;align-items:center;padding:0;background:#0B0A08}
+#titleArt{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;pointer-events:none;display:block}
 #titleHits{position:absolute;left:50%;transform:translateX(-50%);bottom:11%;
   width:min(72vw,340px);height:28vh;min-height:132px;z-index:80;display:flex;flex-direction:column}
 #titleHits button{flex:1;background:transparent;border:0;cursor:pointer;padding:0;
@@ -446,7 +446,7 @@ body.mob.ingame #mhud{display:flex;position:absolute;left:0;right:0;top:0;z-inde
   background-image:var(--tex-paper);background-color:#C6BB9E;padding:0 6px;
   border:1px solid #0A0806;box-shadow:inset 0 0 0 1px rgba(110,92,64,.4);
   text-shadow:0 1px 0 rgba(255,246,220,.35)}
-.chip b.bad{color:#C0392B;animation:blink 1s steps(2) infinite}
+.chip b.bad{color:#E26A1A;animation:blink 1s steps(2) infinite}
 #mclock{margin-left:auto;flex:none;text-align:right;pointer-events:auto;padding:3px 9px;
   background-image:var(--tex-metal);background-color:#16120D;border:1px solid #0A0806;
   box-shadow:inset 0 0 0 1px rgba(158,136,98,.15),0 2px 5px rgba(0,0,0,.55)}
@@ -472,7 +472,7 @@ body.mob.ingame #mhud{display:flex;position:absolute;left:0;right:0;top:0;z-inde
   font-family:var(--mono);font-size:11px;font-weight:700;color:#FF9A78;letter-spacing:.06em;
   box-shadow:0 2px 6px rgba(0,0,0,.6)}
 #mprep.on{display:block;animation:prepPulse 1s ease-in-out infinite}
-@keyframes prepPulse{50%{color:#FFD2B0;border-color:#C0392B}}
+@keyframes prepPulse{50%{color:#FFD2B0;border-color:#E26A1A}}
 
 /* 우하단 큰 버튼 3개 — 엄지 반경 안 */
 /* 화면 최하단에 모은 4개 버튼. 사파리 하단 툴바에 가리지 않도록 여백을 둔다. */
@@ -656,7 +656,7 @@ span.vface,span.pic{display:inline-block}
 .ct{color:#ED4A38;font-size:23px;font-weight:900;letter-spacing:.13em;margin:8px 0 12px;text-shadow:0 0 18px rgba(232,54,42,.35)}
 .ccard p{color:#D8D2C2;font-size:13.5px;line-height:1.85;margin:0 0 12px}
 .cs{color:#E8A317;font-weight:800;font-size:16px;letter-spacing:.2em;margin-bottom:10px;text-shadow:0 0 14px rgba(232,163,23,.35)}
-.cx{color:#C0392B;font-size:12px;letter-spacing:.05em;margin-bottom:12px}
+.cx{color:#E26A1A;font-size:12px;letter-spacing:.05em;margin-bottom:12px}
 .cf{border-top:1px solid #3A362E;color:#8F887A;font-size:10.5px;padding-top:8px;font-family:var(--mono)}
 #cVid{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;background:#000}
 #cine.vid #cVid{display:block}
@@ -686,7 +686,7 @@ span.vface,span.pic{display:inline-block}
         <div class="cf">발신 : 국가재난안전본부&nbsp;&nbsp;&nbsp;긴급재난문자 2026-07-25 12:00</div>
       </div>
     </div>
-    <video id="cVid" src="intro.mp4?v=55" muted autoplay playsinline webkit-playsinline preload="auto"></video>
+    <video id="cVid" src="intro.mp4?v=56" muted autoplay playsinline webkit-playsinline preload="auto"></video>
     <div id="cBtns"><button id="cSnd">🔇 소리 켜기</button><button id="cSkip">건너뛰기 ▸</button></div>
   </div>
   <audio id="bgm" loop preload="auto" playsinline>
@@ -841,6 +841,7 @@ span.vface,span.pic{display:inline-block}
   </div>
 
   <div class="over" id="start">
+    <img id="titleArt" src="assets/title-bg.png" alt="">
     <div id="titleHits">
       <button type="button" id="btnStart" aria-label="GAME START"></button>
       <button type="button" id="btnOpt" aria-label="OPTION"></button>
@@ -981,7 +982,7 @@ function dir4(dx,dy){
 /* 총열 끝 위치 — 각 방향 스프라이트에서 실측한 비율 (가로, 세로) */
 const MUZ={h_f:[.987,.741],h_l:[.070,.731],h_r:[.925,.731],h_b:[.987,.741]};
 for(const k in SPR){const im=new Image();im.src=SPR[k].s;IMG[k]=im;}
-IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=54';
+IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=56';
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 /* 스프라이트는 바닥 중앙 기준으로 놓는다 — 발이 땅에 닿게 */
 /* 스프라이트 키가 바뀌어도 한 곳의 오타로 게임 전체가 죽지 않게 한다.
@@ -1140,7 +1141,7 @@ const RES_DEF={
     {k:'spd',   n:'이동 속도',  d:'+7% / 단계',              max:5,base:8, step:7},
     {k:'pick',  n:'습득 반경',  d:'+25% / 단계',             max:5,base:8, step:6}
   ]},
-  facility:{n:'생활 시설',c:'#82A83E',nodes:[
+  facility:{n:'생활 시설',c:'#6E6588',nodes:[
     {k:'farmOut',n:'수경 재배', d:'식량 +25% / 단계',max:5,base:10,step:8},
     {k:'houseCap',n:'증축',    d:'주거 수용 +1 / 단계',max:4,base:12,step:9},
     {k:'labSpd', n:'연구 효율', d:'+22% / 단계',   max:5,base:14,step:10},
@@ -1160,7 +1161,7 @@ const APT_N={tower:'사격',farm:'농사',lab:'연구',squad:'탐색'};
 const ITEM_SEC=30;
 const ITEMS={
   atk:  {n:'강화 탄약',  d:'공격력 +70%',     c:'#E8A317', ic:'▲', f:'증평 막걸리의 알콜 기운이 단전에서 올라온다. 막걸리는 역시 증평막걸리지.'},
-  spd:  {n:'전투 각성제',d:'공격속도 +80%',   c:'#C0392B', ic:'≡', f:'커피의 요정의 커피다. 천연 카페인의 각성효과가 온 몸을 감싼다. 오늘 잠자긴 글렀군.'},
+  spd:  {n:'전투 각성제',d:'공격속도 +80%',   c:'#E26A1A', ic:'≡', f:'커피의 요정의 커피다. 천연 카페인의 각성효과가 온 몸을 감싼다. 오늘 잠자긴 글렀군.'},
   move: {n:'경량 장구',  d:'이동속도 +45%',   c:'#8FA84E', ic:'»'},
   multi:{n:'산탄 개조',  d:'탄환 +2발',       c:'#D08A3C', ic:'✳'},
   pick: {n:'자력 수집기',d:'습득 반경 +160%', c:'#5FC9BE', ic:'◎'},
@@ -2328,7 +2329,7 @@ function killZ(z){
     G.itemCd=ri(75,135); dropItem(z.x,z.y,false);
     say('뭔가 떨어졌다. 주워.','good','hero');
   }
-  burst(z.x,z.y,'#82A83E',z.kind==='boss'?40:9);
+  burst(z.x,z.y,'#6E6588',z.kind==='boss'?40:9);
   const n=z.kind==='boss'?14:1;
   for(let k=0;k<n;k++)
     G.dr.push({x:z.x+rnd(-9,9),y:z.y+rnd(-9,9),v:Math.max(1,Math.round(z.val/n*dropMul())),life:26,bob:rnd(0,TAU)});
@@ -2569,7 +2570,7 @@ function draw(){
     const hp=Math.max(0,d.hp/d.maxHp);
     ctx.strokeStyle='rgba(0,0,0,.7)';ctx.lineWidth=6;
     ctx.beginPath();ctx.arc(d.x,d.y,62,0,TAU);ctx.stroke();
-    ctx.strokeStyle='#C0392B';ctx.lineWidth=6;
+    ctx.strokeStyle='#E26A1A';ctx.lineWidth=6;
     ctx.beginPath();ctx.arc(d.x,d.y,62,-Math.PI/2,-Math.PI/2+TAU*hp);ctx.stroke();
     // 붕괴 카운트다운
     ctx.font='700 15px ui-monospace,monospace';ctx.textAlign='center';
@@ -2627,14 +2628,14 @@ function draw(){
     const [gx,gy]=cellOf(pw.x,pw.y);
     const ok=canPlace(gx,gy)&&G.scrap>=bCost(selBuild);
     spr(bkey1(selBuild),gx*CELL+CELL/2,gy*CELL+CELL-5,1,false,.5);
-    if(!ok)sprFlash(bkey1(selBuild),gx*CELL+CELL/2,gy*CELL+CELL-5,1,false,'#C0392B',.5);
-    ctx.strokeStyle=ok?'#E8A317':'#C0392B';ctx.lineWidth=1.5;
+    if(!ok)sprFlash(bkey1(selBuild),gx*CELL+CELL/2,gy*CELL+CELL-5,1,false,'#E26A1A',.5);
+    ctx.strokeStyle=ok?'#E8A317':'#E26A1A';ctx.lineWidth=1.5;
     ctx.setLineDash([5,4]);ctx.strokeRect(gx*CELL+2,gy*CELL+2,CELL-4,CELL-4);ctx.setLineDash([]);
   }
   ctx.restore();
 
   // 화면 밖 지시자
-  for(const d of g.dung)arrow(d.x,d.y,'#C0392B',
+  for(const d of g.dung)arrow(d.x,d.y,'#E26A1A',
     Math.round(dist(g.p.x,g.p.y,d.x,d.y))+'m · '+Math.ceil(d.breakAt-d.t)+'s');
   if(g.rescue&&!g.rescue.taken)arrow(g.rescue.x,g.rescue.y,'#4FD1C5',
     Math.round(dist(g.p.x,g.p.y,g.rescue.x,g.rescue.y))+'m');
@@ -2697,7 +2698,7 @@ function drawCore(){
   }
   ctx.strokeStyle='rgba(0,0,0,.65)';ctx.lineWidth=5;
   ctx.beginPath();ctx.arc(0,10,66,0,TAU);ctx.stroke();
-  ctx.strokeStyle=hp>.4?'#4FD1C5':'#C0392B';ctx.lineWidth=5;
+  ctx.strokeStyle=hp>.4?'#4FD1C5':'#E26A1A';ctx.lineWidth=5;
   ctx.beginPath();ctx.arc(0,10,66,-Math.PI/2,-Math.PI/2+TAU*hp);ctx.stroke();
   /* 가족 — 아내는 관제탑 난간에서 사격하고, 딸은 코어 옆에서 서성인다 */
   if(hasWife())spr('wife',16,-46,.60,C.fa!==undefined&&Math.cos(C.fa)<0);
@@ -2747,14 +2748,14 @@ function drawB(b){
   // 배치 표시등
   if(d.worker){
     const on=!!b.worker, ai=!on&&aiOn();
-    ctx.fillStyle=on?'#8FBF3E':ai?'#5FC9BE':'#C0392B';
+    ctx.fillStyle=on?'#3DB8C8':ai?'#5FC9BE':'#E26A1A';
     ctx.beginPath();ctx.arc(x+CELL-6,y+5,3.2,0,TAU);ctx.fill();
     ctx.strokeStyle='rgba(0,0,0,.7)';ctx.lineWidth=1;ctx.stroke();
     if(!on){ctx.font='700 8px ui-monospace,monospace';ctx.textAlign='center';
-      ctx.fillStyle=ai?'#5FC9BE':'#C0392B';ctx.fillText(ai?'AI':'무인',b.x,y-2);}
+      ctx.fillStyle=ai?'#5FC9BE':'#E26A1A';ctx.fillText(ai?'AI':'무인',b.x,y-2);}
   }
   if(hp<1){ctx.fillStyle='rgba(0,0,0,.75)';ctx.fillRect(x+4,y+CELL-4,CELL-8,3);
-    ctx.fillStyle=hp>.4?'#8FBF3E':'#C0392B';ctx.fillRect(x+4,y+CELL-4,(CELL-8)*hp,3);}
+    ctx.fillStyle=hp>.4?'#3DB8C8':'#E26A1A';ctx.fillRect(x+4,y+CELL-4,(CELL-8)*hp,3);}
   if(selObj===b){ctx.strokeStyle='#E8A317';ctx.lineWidth=2;ctx.setLineDash([4,3]);
     ctx.strokeRect(x,y,CELL,CELL);ctx.setLineDash([]);}
 }
@@ -2772,7 +2773,7 @@ function drawZ(z){
   const [k,flip]=zKey(z), sc=ZSC[z.kind], base=z.y+z.r*.55;
   shadow(z.x,base-1,z.r*.85,z.r*.3,.45);
   if(!spr(k,z.x,base,sc,flip)){
-    ctx.fillStyle='#82A83E';ctx.beginPath();ctx.arc(z.x,z.y,z.r,0,TAU);ctx.fill();
+    ctx.fillStyle='#6E6588';ctx.beginPath();ctx.arc(z.x,z.y,z.r,0,TAU);ctx.fill();
   } else {
     const b=bloodSpr(k);
     if(b){
@@ -2794,7 +2795,7 @@ function drawZ(z){
   if(z.kind==='boss'||z.kind==='brute'){
     const w=z.r*2, hp=Math.max(0,z.hp/z.maxHp);
     ctx.fillStyle='rgba(0,0,0,.75)';ctx.fillRect(z.x-w/2,base-SZ(k).h*sc-7,w,4);
-    ctx.fillStyle='#C0392B';ctx.fillRect(z.x-w/2,base-SZ(k).h*sc-7,w*hp,4);
+    ctx.fillStyle='#E26A1A';ctx.fillRect(z.x-w/2,base-SZ(k).h*sc-7,w*hp,4);
     if(z.kind==='boss'){
       if(z.atk==='dash'){
         ctx.strokeStyle='rgba(210,50,32,.62)';ctx.lineWidth=3;
@@ -2832,7 +2833,7 @@ function drawSquad(v){
   const hp=Math.max(0,v.hp/v.maxHp);
   if(hp<1){
     ctx.fillStyle='rgba(0,0,0,.75)';ctx.fillRect(v.x-9,top-5,18,3);
-    ctx.fillStyle=hp>.4?'#D08A3C':'#C0392B';ctx.fillRect(v.x-9,top-5,18*hp,3);
+    ctx.fillStyle=hp>.4?'#D08A3C':'#E26A1A';ctx.fillRect(v.x-9,top-5,18*hp,3);
   }
 }
 function drawEsc(e){
@@ -2841,7 +2842,7 @@ function drawEsc(e){
   spr(k,e.x,e.y+9,ESC_SC,false);
   const w=18,hp=Math.max(0,e.hp/e.maxHp);
   ctx.fillStyle='rgba(0,0,0,.75)';ctx.fillRect(e.x-w/2,top-6,w,3);
-  ctx.fillStyle=hp>.4?'#4FD1C5':'#C0392B';ctx.fillRect(e.x-w/2,top-6,w*hp,3);
+  ctx.fillStyle=hp>.4?'#4FD1C5':'#E26A1A';ctx.fillRect(e.x-w/2,top-6,w*hp,3);
 }
 /* 정지 포즈 한 장으로 달리기를 만든다 —
    허리에서 잘라 다리는 좌우로 전단(shear), 상체는 위아래로 들썩이며 살짝 기운다. */
@@ -3635,14 +3636,14 @@ function sheetBldgsHTML(){
     const wk=!d.worker?'<span style="color:#8B7F66">인력 불필요</span>'
       :(b.worker?`<span style="color:#8FA84E">${b.worker.name}</span>`
         :(aiOn()?`<span style="color:#5FC9BE">AI 관제 — ${Math.round(aiEff()*100)}% 가동</span>`
-                :'<span style="color:#C0392B">무인 — 작동 정지</span>'));
+                :'<span style="color:#E26A1A">무인 — 작동 정지</span>'));
     return `<div class="gcard" data-b="${b.id}">
       <div class="gtop">
         <img src="${(SPR[bkey(b)]||{s:''}).s}">
         <div class="gi">
           <div class="gn">${d.n}${b.tier>1?` · ${TN[b.tier]}`:''}</div>
           <div class="gw">${wk}</div>
-          <div class="ghp"><div style="width:${hp*100}%;background:${hp>.5?'#8FA84E':hp>.25?'#D8A32E':'#C0392B'}"></div></div>
+          <div class="ghp"><div style="width:${hp*100}%;background:${hp>.5?'#8FA84E':hp>.25?'#D8A32E':'#E26A1A'}"></div></div>
         </div>
         <div class="gp">${Math.ceil(b.hp)}<i>/${Math.ceil(b.maxHp)}</i></div>
       </div>
@@ -3689,7 +3690,7 @@ function sheetBldgHTML(b){
   const need=repairCost(b);
   const wk=b.worker?`배치: <b style="color:#8FA84E">${b.worker.name}</b>`
     :(d.worker?(aiOn()?`<b style="color:#5FC9BE">무인 — AI 관제로 ${Math.round(aiEff()*100)}% 가동 중</b>`
-                      :'<b style="color:#C0392B">무인 — 사람을 배치해야 작동한다</b>'):'');
+                      :'<b style="color:#E26A1A">무인 — 사람을 배치해야 작동한다</b>'):'');
   return `<div style="display:flex;gap:12px;align-items:center">
       <img src="${(SPR[bkey(b)]||{s:''}).s}" style="height:58px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.7))">
       <div style="flex:1;font-size:11.5px;color:#CFC4A8;line-height:1.5">
@@ -3741,7 +3742,23 @@ function begin(cont){
   document.getElementById('over').style.display='none';
   mode='play'; last=performance.now(); sfx('build');
 }
+function layoutTitle(){
+  const img=document.getElementById('titleArt'), hits=document.getElementById('titleHits');
+  if(!img||!hits)return;
+  const r=img.getBoundingClientRect();
+  if(r.width<8||r.height<8)return;
+  hits.style.transform='none';
+  hits.style.left=(r.left+r.width*0.28)+'px';
+  hits.style.width=(r.width*0.44)+'px';
+  hits.style.top=(r.top+r.height*0.66)+'px';
+  hits.style.height=(r.height*0.26)+'px';
+  hits.style.bottom='auto';
+}
 (function(){
+  const art=document.getElementById('titleArt');
+  if(art){art.onload=layoutTitle; addEventListener('resize',layoutTitle);
+    if(typeof visualViewport!=='undefined'&&visualViewport)visualViewport.addEventListener('resize',layoutTitle);
+    if(art.complete)layoutTitle();}
   const tap=(el,fn)=>{if(!el)return; const f=e=>{e.preventDefault();e.stopPropagation();fn();};
     el.addEventListener('pointerup',f);};
   const armBgm=()=>{syncBgm();};
