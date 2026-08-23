@@ -1001,7 +1001,7 @@ function dir4(dx,dy){
 /* 총열 끝 위치 — 각 방향 스프라이트에서 실측한 비율 (가로, 세로) */
 const MUZ={h_f:[.987,.741],h_l:[.070,.731],h_r:[.925,.731],h_b:[.987,.741]};
 for(const k in SPR){const im=new Image();im.src=SPR[k].s;IMG[k]=im;}
-IMG.mapGround=new Image();IMG.mapGround.src='assets/map-top.png?v=84';
+IMG.mapGround=new Image();IMG.mapGround.src='assets/map-top.png?v=85';
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 /* 스프라이트는 바닥 중앙 기준으로 놓는다 — 발이 땅에 닿게 */
 /* 스프라이트 키가 바뀌어도 한 곳의 오타로 게임 전체가 죽지 않게 한다.
@@ -2516,14 +2516,13 @@ function draw(){
   const l=g.p.x-hw-60,r=g.p.x+hw+60,t=g.p.y-hh-60,b=g.p.y+hh+60;
 
   ctx.save();ctx.beginPath();ctx.arc(0,0,WR,0,TAU);ctx.clip();
-  /* 바깥은 같은 톤의 땅 — 검은 원판/하늘처럼 보이지 않게 */
   ctx.fillStyle='#12161C';
   ctx.fillRect(-WR,-WR,WR*2,WR*2);
   const mg=IMG.mapGround;
   if(mg&&mg.complete&&mg.naturalWidth){
-    /* 광장+폐허가 건설 반경(~900) 안에 들어오게. WR(2400)에 맞추면 가운데 돌만 확대된다 */
-    const cover=2000;
-    const s=Math.max(cover/mg.naturalWidth, cover/mg.naturalHeight);
+    /* 원판 전체를 덮는다. 가로로 긴 그림을 세로 화면에 맞추다 잘리면 안 된다.
+       광장 중심은 코어(0,0). */
+    const s=Math.max(WR*2/mg.naturalWidth, WR*2/mg.naturalHeight);
     const mw=mg.naturalWidth*s, mh=mg.naturalHeight*s;
     ctx.imageSmoothingEnabled=false;
     ctx.drawImage(mg,-mw/2,-mh/2,mw,mh);
