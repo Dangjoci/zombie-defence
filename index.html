@@ -1610,17 +1610,30 @@ function pickKind(){
 }
 
 /* ═══════════ 이벤트 (구조 미션) ═══════════ */
-/* 구조 신호의 구성. 처음 두 번은 부부, 그 뒤로는 대부분 단독이고 가끔 아이를 데리고 있다. */
+/* 구조 신호의 구성. 처음 두 번은 부부, 그 뒤로는 어른/아이 조합. */
 function rescueParty(){
   const n=G.rescueDone;
   if(n<2)return FIXED[n].map(nm=>({role:'worker',name:nm}));
   const r=Math.random();
-  if(r<.60)return [{role:'worker'}];
-  if(r<.85)return [{role:'worker'},{role:'child'}];
-  return [{role:'worker'},{role:'worker'}];
+  if(r<.40)return [{role:'worker'}];
+  if(r<.60)return [{role:'worker'},{role:'child'}];
+  if(r<.75)return [{role:'worker'},{role:'worker'}];
+  if(r<.90)return [{role:'child'}];
+  return [{role:'child'},{role:'child'}];
 }
-const partyLabel=p=>p.length===1?'생존자 1명'
-  :p.some(m=>m.role==='child')?'어른 1명과 아이 1명':'부부 2명';
+function partyLabel(p){
+  const a=p.filter(m=>m.role!=='child').length;
+  const k=p.filter(m=>m.role==='child').length;
+  if(a===0&&k===1)return '아이 1명';
+  if(a===0&&k===2)return '아이 2명';
+  if(a===1&&k===0)return '생존자 1명';
+  if(a===1&&k===1)return '어른 1명과 아이 1명';
+  if(a===2&&k===0)return '부부 2명';
+  const bits=[];
+  if(a)bits.push('어른 '+a+'명');
+  if(k)bits.push('아이 '+k+'명');
+  return bits.join('과 ')||'생존자';
+}
 function triggerRescue(){
   const party=rescueParty();
   if(G.vs.length+party.length>popCap()){
@@ -3554,7 +3567,7 @@ function begin(cont){
   tap(document.getElementById('btnExit'),()=>{
     try{window.close();}catch(e){}
     try{open('','_self');window.close();}catch(e){}
-    setTimeout(()=>{if(!window.closed){document.body.innerHTML='';document.title='종료';}},80);
+    setTimeout(()=>{try{window.close();}catch(e){}},50);
   });
 })();
 document.getElementById('btnCont').onclick=()=>begin(true);
