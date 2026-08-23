@@ -1758,8 +1758,8 @@ function deliverRescue(){
   }
   if(alive.some(e=>e.role==='child'))say('아이는 일을 하지 못한다. 먹기만 한다.','bad');
   if(quote) bigAlert(quote.who, quote.line, 'good', 4.4, '✓', pfHTML(faceV,'pic'));
-  else if(names.length)bigAlert('마을에 합류했습니다',names.join(', '),'good',2.6,'✓',firstV?pfHTML(firstV,'pic'):null);
-  else bigAlert('구조에 실패했습니다','아무도 데려오지 못했습니다','bad',2.8);
+  else if(names.length)bigAlert('나', `${names.join(', ')} — 마을에 합류했다.`, 'good', 3.2, '✓', heroFace());
+  else bigAlert('나','아무도 데려오지 못했다.','bad',2.8,'✕',heroFace());
   if(G.rescueDone>=2)escalate();
   G.nextEvent=G.t+rnd(13,19);
   renderBuild();
@@ -2341,6 +2341,8 @@ function autoAssign(){
   if(over>0)for(let i=G.vs.length-1;i>=0&&over>0;i--)
     if(G.vs[i].job==='squad'&&!G.vs[i].manual){G.vs[i].job=null;over--;}
 }
+function heroV(){return (G&&G.vs&&G.vs.find(v=>v.role==='hero'))||{role:'hero',name:'나'};}
+function heroFace(){return pfHTML(heroV(),'pic');}
 function dropAsk(v){
   if(v.role==='child')return '정말 버릴거야? 아이인데?';
   return '추방하시겠습니까?';
@@ -2350,17 +2352,16 @@ function removeV(v,starved){
   const b=G.bs.find(b=>b.worker===v); if(b)b.worker=null;
   G.vs.splice(G.vs.indexOf(v),1);
   if(starved){ say(`${iga(v.name)} 굶주림으로 쓰러졌다.`,'bad'); return; }
-  const face=pfHTML(v,'pic');
   if(v.role==='child'){
     const a='아이는 울면서 나가기 싫다고 버텼지만 우리는 아이를 밀어냈다.';
     const b='멀리서 아이의 비명소리가 들렸다.';
     say(a,'bad'); say(b,'bad');
-    bigAlert(v.name, a+' '+b, 'bad', 4.8, '✕', face);
+    bigAlert('나', a+' '+b, 'bad', 4.8, '✕', heroFace());
   } else {
     const a='그는 우리에게 저주와 욕설을 퍼부었다. 어쩔 수 없다. 우리는 생존해야 한다.';
     const b='멀리서 비명 소리가 들려온다.';
     say(a,'bad'); say(b,'bad');
-    bigAlert(v.name, a+' '+b, 'bad', 4.8, '✕', face);
+    bigAlert('나', a+' '+b, 'bad', 4.8, '✕', heroFace());
   }
   sfx('over'); hap([0,80,40,80]); shake(4);
 }
