@@ -987,7 +987,7 @@ function dir4(dx,dy){
 /* 총열 끝 위치 — 각 방향 스프라이트에서 실측한 비율 (가로, 세로) */
 const MUZ={h_f:[.987,.741],h_l:[.070,.731],h_r:[.925,.731],h_b:[.987,.741]};
 for(const k in SPR){const im=new Image();im.src=SPR[k].s;IMG[k]=im;}
-IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=71';
+IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=72';
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 /* 스프라이트는 바닥 중앙 기준으로 놓는다 — 발이 땅에 닿게 */
 /* 스프라이트 키가 바뀌어도 한 곳의 오타로 게임 전체가 죽지 않게 한다.
@@ -1317,7 +1317,7 @@ function loadGameInner(d){
   /* 구버전 세이브가 최종 국면 도중이라면, 이미 지난 파도는 다시 쏟아내지 않는다 */
   if(G.phase==='final'&&d.finalPulse===undefined)
     G.finalPulse=FINAL_PULSES.filter(P=>G.t-FINAL_T>=P.at).length;
-  if(d.ruins&&d.ruins.length)G.ruins=d.ruins;
+  G.ruins=[];
   G.core.hp=d.core.hp; G.core.lvl=d.core.lvl;
   G.p.x=d.p.x; G.p.y=d.p.y; G.p.hp=d.p.hp;
   G.vs=d.vs.map(v=>{
@@ -1384,16 +1384,7 @@ function reset(){
   G.vs[1].job='core';
   for(const t in RES_DEF) for(const n of RES_DEF[t].nodes) G.R[n.k]=0;
   selBuild=null; selObj=null; rosterSig=''; document.getElementById('sel').style.display='none';
-  /* 폐허 — 월드 외곽에 띠를 이루고, 안쪽에 잔해 몇 개 */
   G.ruins=[];
-  for(let i=0;i<24;i++){
-    const a=(i/24)*TAU+((i*7)%5)*0.055, rr=1760+((i*263)%460);
-    G.ruins.push({x:Math.cos(a)*rr,y:Math.sin(a)*rr,k:'r'+(i%8),f:(i%2)===0,s:0.85+((i*53)%30)/100});
-  }
-  for(let i=0;i<8;i++){
-    const a=i*0.83+0.4, rr=1090+((i*197)%370);
-    G.ruins.push({x:Math.cos(a)*rr,y:Math.sin(a)*rr,k:'r'+((i+3)%8),f:i%2===1,s:0.5});
-  }
   say('한겨울이다. 코어 켠다. 여보, 부탁해.','good','hero');
   say('여보, 내가 여기서 막을게. 당신은 앞으로.','good','wife');
 }
@@ -2593,7 +2584,6 @@ function draw(){
   }
   /* 깊이 정렬 — 아래쪽에 있는 것이 위를 가린다 */
   const rend=[];
-  for(const u of g.ruins)if(u.x>l-420&&u.x<r+420&&u.y>t-420&&u.y<b+420)rend.push([u.y,drawRuin,u]);
   for(const bl of g.bs)rend.push([bl.gy*CELL+CELL,drawB,bl]);
   rend.push([58,drawCore,null]);
   for(const z of g.zs)if(z.x>l-60&&z.x<r+60&&z.y>t-90&&z.y<b+60)rend.push([z.y,drawZ,z]);
