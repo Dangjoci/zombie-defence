@@ -1709,9 +1709,24 @@ function deliverRescue(){
   for(const e of alive){const v=newVillager(e.role,e.name);G.vs.push(v);if(!firstV)firstV=v;names.push(v.name+(e.role==='child'?'(아이)':''));}
   G.esc=[];G.rescue=null;G.rescueDone++;
   G.maxPop=Math.max(G.maxPop,G.vs.length);
-  say(names.length?`${names.join(', ')} — 마을에 합류했다.`:'아무도 데려오지 못했다.',names.length?'good':'bad');
+  const nm=new Set(alive.map(e=>e.name));
+  let quote=null, faceV=firstV;
+  if(nm.has('종호')||nm.has('진화')){
+    quote={who:'종호', line:'역시, 여기까지 오면 구하러 올 줄 알았지!'};
+    faceV=G.vs.find(v=>v.name==='종호')||{name:'종호',role:'worker',sex:'m'};
+  } else if(nm.has('종면')||nm.has('미래')){
+    quote={who:'종면', line:'형! 살아있었구나! 장비 좀 챙기느라 늦었어.'};
+    faceV=G.vs.find(v=>v.name==='종면')||{name:'종면',role:'worker',sex:'m'};
+  }
+  if(quote){
+    say(quote.line,'good');
+    if(names.length)say(`${names.join(', ')} — 마을에 합류했다.`,'good');
+  } else {
+    say(names.length?`${names.join(', ')} — 마을에 합류했다.`:'아무도 데려오지 못했다.',names.length?'good':'bad');
+  }
   if(alive.some(e=>e.role==='child'))say('아이는 일을 하지 못한다. 먹기만 한다.','bad');
-  if(names.length)bigAlert('마을에 합류했습니다',names.join(', '),'good',2.6,'✓',firstV?pfHTML(firstV,'pic'):null);
+  if(quote) bigAlert(quote.who, quote.line, 'good', 4.4, '✓', pfHTML(faceV,'pic'));
+  else if(names.length)bigAlert('마을에 합류했습니다',names.join(', '),'good',2.6,'✓',firstV?pfHTML(firstV,'pic'):null);
   else bigAlert('구조에 실패했습니다','아무도 데려오지 못했습니다','bad',2.8);
   if(G.rescueDone>=2)escalate();
   G.nextEvent=G.t+rnd(13,19);
