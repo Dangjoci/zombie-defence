@@ -637,9 +637,9 @@ span.vface,span.pic{display:inline-block}
   background-position:calc(var(--pfc)*var(--pfs)*-1) calc(var(--pfr)*var(--pfs)*-1)}
 
 /* ── 시네마틱 인트로: 재난문자 → 트레일러 → 타이틀 ── */
-#cine{position:fixed;inset:0;z-index:100;background:#050403;display:flex;align-items:center;justify-content:center;transition:opacity .55s}
+#cine{position:fixed;inset:0;z-index:200;background:#050403;display:flex;align-items:center;justify-content:center;transition:opacity .55s;pointer-events:auto}
 #cine.out{opacity:0;pointer-events:none}
-#cAlert{width:min(88vw,360px);user-select:none;cursor:pointer;
+#cAlert{display:none;width:min(88vw,360px);user-select:none;cursor:pointer;
   animation:cin .45s cubic-bezier(.2,1.4,.4,1) both,cshake .5s .5s steps(2) 3}
 @keyframes cin{from{transform:scale(.72);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes cshake{0%,100%{transform:translate(0,0)}25%{transform:translate(-3px,1px)}75%{transform:translate(3px,-1px)}}
@@ -654,7 +654,7 @@ span.vface,span.pic{display:inline-block}
 .cs{color:#E8A317;font-weight:800;font-size:16px;letter-spacing:.2em;margin-bottom:10px;text-shadow:0 0 14px rgba(232,163,23,.35)}
 .cx{color:#C0392B;font-size:12px;letter-spacing:.05em;margin-bottom:12px}
 .cf{border-top:1px solid #3A362E;color:#8F887A;font-size:10.5px;padding-top:8px;font-family:var(--mono)}
-#cVid{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:none;background:#000}
+#cVid{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;background:#000}
 #cine.vid #cVid{display:block}
 #cBtns{position:absolute;top:calc(12px + env(safe-area-inset-top));right:14px;display:none;gap:8px;z-index:2}
 #cine.vid #cBtns{display:flex}
@@ -667,6 +667,57 @@ span.vface,span.pic{display:inline-block}
 </style>
 </head>
 <body>
+  <div id="cine" class="vid">
+    <div id="cAlert">
+      <div class="cbar"><span>▂▄▆█</span><span>[ 국가재난문자 ]</span><span>▮▮▮▯</span></div>
+      <div class="ccard">
+        <div class="cwarn">⚠</div>
+        <div class="ct">생물학적 테러 발생</div>
+        <p>현 시간부로 국가 시스템이 붕괴되었습니다.<br>
+        정부는 기능을 상실하였으며,<br>
+        치안, 의료, 통신이 마비되었습니다.<br>
+        국가는 더 이상 국민을 보호할 수 없습니다.</p>
+        <div class="cs">자력으로 생존하십시오.</div>
+        <div class="cx">⚠ 추가 정보는 제공되지 않습니다. ⚠</div>
+        <div class="cf">발신 : 국가재난안전본부&nbsp;&nbsp;&nbsp;긴급재난문자 2026-07-25 12:00</div>
+      </div>
+    </div>
+    <video id="cVid" src="intro.mp4" muted autoplay playsinline webkit-playsinline preload="auto"></video>
+    <div id="cBtns"><button id="cSnd">🔇 소리 켜기</button><button id="cSkip">건너뛰기 ▸</button></div>
+  </div>
+
+
+<script>
+(function(){
+  var cine=document.getElementById('cine');
+  var vid=document.getElementById('cVid');
+  var skip=document.getElementById('cSkip');
+  var snd=document.getElementById('cSnd');
+  if(!cine||!vid)return;
+  var done=false;
+  function endCine(){
+    if(done)return; done=true;
+    try{vid.pause();}catch(e){}
+    cine.classList.add('out');
+    setTimeout(function(){ cine.style.display='none'; }, 560);
+  }
+  vid.addEventListener('ended', endCine);
+  vid.addEventListener('error', function(){ console.warn('intro failed', vid.error); });
+  if(skip) skip.addEventListener('pointerup', function(e){ e.preventDefault(); e.stopPropagation(); endCine(); });
+  if(snd){
+    snd.textContent='🔇 소리 켜기';
+    snd.addEventListener('pointerup', function(e){
+      e.preventDefault(); e.stopPropagation();
+      vid.muted=!vid.muted;
+      snd.textContent=vid.muted?'🔇 소리 켜기':'🔊 소리 끄기';
+      vid.play().catch(function(){});
+    });
+  }
+  function tryPlay(){ vid.play().catch(function(){}); }
+  tryPlay();
+  cine.addEventListener('pointerup', function(){ if(vid.paused) tryPlay(); });
+})();
+</script>
 <canvas id="cv"></canvas>
 
 <div id="ui">
@@ -779,25 +830,6 @@ span.vface,span.pic{display:inline-block}
     <div id="labTabs"></div>
     <div id="trees"></div>
     <button id="labClose">닫기 [R]</button>
-  </div>
-
-  <div id="cine">
-    <div id="cAlert">
-      <div class="cbar"><span>▂▄▆█</span><span>[ 국가재난문자 ]</span><span>▮▮▮▯</span></div>
-      <div class="ccard">
-        <div class="cwarn">⚠</div>
-        <div class="ct">생물학적 테러 발생</div>
-        <p>현 시간부로 국가 시스템이 붕괴되었습니다.<br>
-        정부는 기능을 상실하였으며,<br>
-        치안, 의료, 통신이 마비되었습니다.<br>
-        국가는 더 이상 국민을 보호할 수 없습니다.</p>
-        <div class="cs">자력으로 생존하십시오.</div>
-        <div class="cx">⚠ 추가 정보는 제공되지 않습니다. ⚠</div>
-        <div class="cf">발신 : 국가재난안전본부&nbsp;&nbsp;&nbsp;긴급재난문자 2026-07-25 12:00</div>
-      </div>
-    </div>
-    <video id="cVid" playsinline preload="auto"></video>
-    <div id="cBtns"><button id="cSnd">🔇 소리 켜기</button><button id="cSkip">건너뛰기 ▸</button></div>
   </div>
 
   <div class="over" id="start">
@@ -3681,45 +3713,6 @@ document.getElementById('lab').addEventListener('pointerdown',e=>{
   if(e.target.id==='lab')toggleLab(false);      // 바깥 여백을 누르면 닫힌다
 });
 document.getElementById('shDim').onclick=closeSheet;
-
-/* ── 시네마틱 인트로: 트레일러 → 타이틀 ── */
-(function(){
-  const cine=document.getElementById('cine');
-  const vid=document.getElementById('cVid');
-  const skip=document.getElementById('cSkip');
-  const snd=document.getElementById('cSnd');
-  const alert=document.getElementById('cAlert');
-  if(!cine||!vid)return;
-  if(alert)alert.style.display='none';
-  cine.classList.add('vid');
-  vid.src='intro.mp4';
-  vid.setAttribute('playsinline','');
-  vid.setAttribute('webkit-playsinline','');
-  vid.muted=true;
-  vid.loop=false;
-  let done=false;
-  const endCine=()=>{
-    if(done)return; done=true;
-    try{vid.pause();}catch(e){}
-    cine.classList.add('out');
-    setTimeout(()=>{cine.style.display='none';},560);
-  };
-  vid.addEventListener('ended',endCine);
-  if(skip)skip.addEventListener('pointerup',e=>{e.preventDefault();e.stopPropagation();endCine();});
-  if(snd){
-    snd.textContent='🔇 소리 켜기';
-    snd.addEventListener('pointerup',e=>{
-      e.preventDefault();e.stopPropagation();
-      vid.muted=!vid.muted;
-      snd.textContent=vid.muted?'🔇 소리 켜기':'🔊 소리 끄기';
-      vid.play().catch(()=>{});
-    });
-  }
-  const tryPlay=()=>vid.play().catch(()=>{});
-  if(vid.readyState>=2)tryPlay();
-  else vid.addEventListener('canplay',tryPlay,{once:true});
-  cine.addEventListener('pointerup',()=>{if(vid.paused)tryPlay();},{once:true});
-})();
 
 </script>
 </body>
