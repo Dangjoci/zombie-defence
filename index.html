@@ -1196,7 +1196,7 @@ const APT_N={tower:'사격',farm:'농사',lab:'연구',squad:'탐색'};
 const ITEM_SEC=30;
 const ITEMS={
   atk:  {n:'강화 탄약',  d:'공격력 +70%',     c:'#E8A317', ic:'▲', f:'증평 막걸리의 알콜 기운이 단전에서 올라온다. 막걸리는 역시 증평막걸리지.'},
-  spd:  {n:'전투 각성제',d:'공격속도 +80%',   c:'#E26A1A', ic:'≡', f:'커피의 요정의 커피다. 천연 카페인의 각성효과가 온 몸을 감싼다. 오늘 잠자긴 글렀군.'},
+  spd:  {n:'전투 각성제',d:'공격속도 +80%',   c:'#E26A1A', ic:'≡', f:'커피의요정이 만든 커피다. 천연 카페인의 각성 효과가 온 몸을 감싼다.', v:'우오오옷 워…원두펀치!!!'},
   move: {n:'경량 장구',  d:'이동속도 +45%',   c:'#8FA84E', ic:'»'},
   multi:{n:'산탄 개조',  d:'탄환 +2발',       c:'#D08A3C', ic:'✳'},
   pick: {n:'자력 수집기',d:'습득 반경 +160%', c:'#5FC9BE', ic:'◎'},
@@ -2346,11 +2346,13 @@ function grabItem(it){
     G.perks[it.k]=(G.perks[it.k]||0)+1;
     bigAlert('영구 강화 획득',`${I.n} — ${I.d}`+(I.f?`<br><i>${I.f}</i>`:''),'',3.0,'★');
     say(`${I.n}, 챙겼다. 이건 끝까지 간다.`,'good','hero');
-    if(I.f)say(I.f,'good','hero');
+    if(I.f)say(I.f,'good');
+    if(I.v)say(I.v,'good','hero');
   } else {
     G.buffs[it.k]=G.t+ITEM_SEC;
     say(`${I.n}. ${I.d} 잠깐이다.`,'good','hero');
-    if(I.f)say(I.f,'good','hero');
+    if(I.f)say(I.f,'good');
+    if(I.v)say(I.v,'good','hero');
   }
   sfx('good'); hap(25);
 }
