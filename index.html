@@ -1841,6 +1841,7 @@ function deliverRescue(){
       say('먼길 오느라 고생했다 쫑호','good','hero');
     } else if(names.has('종면')||names.has('미래')){
       const v=joined.find(x=>x.name==='종면')||{name:'종면',role:'worker',sex:'m'};
+      say('왜 이렇게 늦었어?','good','hero');
       say('형! 살아있었구나! 장비 좀 챙기느라 늦었어.','good',v.name||'종면',pfHTML(v,'pic'));
     } else {
       for(const v of joined) say(joinLine(v),'good',v.name,pfHTML(v,'pic'));
