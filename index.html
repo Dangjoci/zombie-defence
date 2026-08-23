@@ -2294,11 +2294,18 @@ function autoAssign(){
   if(over>0)for(let i=G.vs.length-1;i>=0&&over>0;i--)
     if(G.vs[i].job==='squad'&&!G.vs[i].manual){G.vs[i].job=null;over--;}
 }
+function dropAsk(v){
+  if(v.role==='child')return '정말 버릴거야? 아이인데?';
+  return '추방하시겠습니까?';
+}
 function removeV(v,starved){
   if(v.role==='hero')return;
   const b=G.bs.find(b=>b.worker===v); if(b)b.worker=null;
   G.vs.splice(G.vs.indexOf(v),1);
-  say(starved?`${iga(v.name)} 굶주림으로 쓰러졌다.`:`${eulreul(v.name)} 마을 밖으로 내보냈다.`,'bad');
+  if(starved){ say(`${iga(v.name)} 굶주림으로 쓰러졌다.`,'bad'); return; }
+  say('멀리서 비명 소리가 들려왔다.','bad');
+  say('우린 이러려고 살아남았나…','bad');
+  sfx('over'); hap([0,80,40,80]); shake(4);
 }
 function gameOver(reason){
   if(typeof closeSheet==='function')closeSheet();
@@ -2865,7 +2872,7 @@ function renderRoster(){
         }));
       sel=`<select class="asg" data-v="${v.id}">${opts.join('')}</select>`;
     }
-    const btn=v.role==='hero'?'':`<button class="drop" data-v="${v.id}">버리기</button>`;
+    const btn=v.role==='hero'?'':`<button class="drop" data-v="${String(v.id)}">버리기</button>`;
     return `<div class="vr2">
       <div class="l1">${pfHTML(v)}<span class="nm">${v.name}<i>${sx}</i></span>${badge}
         <span class="jb ${r.idle?'idle':''}">${r.job}</span>${btn}</div>
@@ -2891,9 +2898,8 @@ function renderRoster(){
     const v0=G.vs.find(v=>String(v.id)===btn.dataset.v);
     if(btn.dataset.arm!=='1'){
       btn.dataset.arm='1';
-      /* 아내와 아이는 대가를 알려준다 — 아내가 떠나면 코어 화력이 준다 */
-      btn.textContent=v0&&v0.role==='wife'?'코어 화력↓ 정말?':v0&&v0.role==='child'?'아이를? 정말?':'정말?';
-      setTimeout(()=>{if(btn.isConnected){btn.dataset.arm='0';btn.textContent='버리기';}},2600);
+      btn.textContent=v0?dropAsk(v0):'추방하시겠습니까?';
+      setTimeout(()=>{if(btn.isConnected){btn.dataset.arm='0';btn.textContent='버리기';}},3200);
       return;
     }
     if(v0)removeV(v0,false);
@@ -3386,20 +3392,24 @@ function sheetVillHTML(){
       v.job==='squad'?'탐색부대': b?bldLabel(b):'대기';
     const cls=v.job==='squad'||b?'on':(v.role==='worker'&&!hurtV(v)?'idle':'');
     const isW=v.role==='worker';
+    const canDrop=v.role!=='hero';
     const sx=v.sex==='f'?'♀':v.sex==='m'?'♂':'';
     const bk=isW?bestApt(v):null;
     const apts=isW?`<div class="vapts">`+Object.keys(APT_N).map(k=>
       `<div class="vapt ${k===bk?'best':''}"><i>${APT_N[k]}</i>
        <div class="ab"><div style="width:${Math.min(100,v.apt[k]/1.6*100)}%"></div></div></div>`).join('')+`</div>`:'';
-    return `<div class="vcard" data-v="${v.id}">
+    return `<div class="vcard" data-v="${String(v.id)}">
       <div class="vtop">${pfHTML(v)}<span class="nm">${v.name}<i>${sx}</i></span>
         <span class="job ${cls}">${job}</span></div>
       ${apts}
-      ${isW?`<div class="vopts" data-v="${v.id}"></div>`:''}
+      ${canDrop?`<div class="vopts" data-v="${String(v.id)}"></div>`:''}
     </div>`;
   }).join('');
 }
 function villOptsHTML(v){
+  if(v.role!=='worker'){
+    return [`<button data-a="drop" class="warn">버리기</button>`].join('');
+  }
   const cur=G.bs.find(b=>b.worker===v);
   const hurt=hurtV(v);
   const bs=G.bs.filter(b=>BDEF[b.t].worker);
@@ -3441,7 +3451,7 @@ function wireSheetVill(C){
           const v2=G.vs.find(x=>String(x.id)===card.dataset.v); if(!v2)return;
           if(bt.dataset.a==='drop'){
             if(bt.dataset.arm!=='1'){bt.dataset.arm='1';
-              bt.textContent=v2.role==='wife'?'코어 화력이 준다 — 정말?':v2.role==='child'?'아이를 정말 버리나?':'정말 버리나?';
+              bt.textContent=dropAsk(v2);
               return;}
             removeV(v2,false); renderSheet(); return;
           }
