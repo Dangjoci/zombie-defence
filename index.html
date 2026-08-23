@@ -713,8 +713,19 @@ span.vface,span.pic{display:inline-block}
     try{ if(window.unlockBgm) window.unlockBgm(); }catch(e){}
   }
   vid.addEventListener('ended', endCine);
-  vid.addEventListener('error', function(){ console.warn('intro failed', vid.error); });
-  if(skip) skip.addEventListener('pointerup', function(e){ e.preventDefault(); e.stopPropagation(); endCine(); });
+  vid.addEventListener('error', function(){ endCine(); });
+  vid.addEventListener('timeupdate', function(){
+    try{
+      if(vid.duration && isFinite(vid.duration) && vid.duration-vid.currentTime<0.3) endCine();
+    }catch(e){}
+  });
+  function bindSkip(el){
+    if(!el)return;
+    var f=function(e){ e.preventDefault(); e.stopPropagation(); endCine(); };
+    el.addEventListener('pointerup', f);
+    el.addEventListener('click', f);
+  }
+  bindSkip(skip);
   if(snd){
     snd.textContent='🔇 소리 켜기';
     snd.addEventListener('pointerup', function(e){
@@ -724,9 +735,12 @@ span.vface,span.pic{display:inline-block}
       vid.play().catch(function(){});
     });
   }
-  function tryPlay(){ vid.play().catch(function(){}); }
+  function tryPlay(){ vid.play().catch(function(){ endCine(); }); }
   tryPlay();
-  cine.addEventListener('pointerup', function(){ if(vid.paused) tryPlay(); });
+  cine.addEventListener('pointerup', function(e){
+    if(e.target===snd || (snd && snd.contains(e.target))) return;
+    if(vid.paused) tryPlay();
+  });
 })();
 </script>
 <canvas id="cv"></canvas>
