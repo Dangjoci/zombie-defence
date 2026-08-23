@@ -985,7 +985,7 @@ function dir4(dx,dy){
 /* 총열 끝 위치 — 각 방향 스프라이트에서 실측한 비율 (가로, 세로) */
 const MUZ={h_f:[.987,.741],h_l:[.070,.731],h_r:[.925,.731],h_b:[.987,.741]};
 for(const k in SPR){const im=new Image();im.src=SPR[k].s;IMG[k]=im;}
-IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=61';
+IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=62';
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 /* 스프라이트는 바닥 중앙 기준으로 놓는다 — 발이 땅에 닿게 */
 /* 스프라이트 키가 바뀌어도 한 곳의 오타로 게임 전체가 죽지 않게 한다.
@@ -1029,22 +1029,21 @@ function silhouette(k,col){
 }
 function bloodSpr(k){
   const id='bld|'+k; if(FCACHE[id])return FCACHE[id];
-  const im=IMG[k]; if(!im||!im.complete||!im.naturalWidth)return null;
+  const im=hardenSpr(k); if(!im)return null;
   const c=document.createElement('canvas');
-  c.width=im.naturalWidth;c.height=im.naturalHeight;
+  c.width=im.width;c.height=im.height;
   const g=c.getContext('2d');
   g.drawImage(im,0,0);
-  g.globalCompositeOperation='source-in';
-  const grd=g.createLinearGradient(0,c.height*0.18,0,c.height*0.92);
-  grd.addColorStop(0,'rgba(132,18,14,0.10)');
-  grd.addColorStop(0.38,'rgba(118,12,12,0.34)');
-  grd.addColorStop(1,'rgba(72,8,8,0.16)');
-  g.fillStyle=grd; g.fillRect(0,0,c.width,c.height);
   g.globalCompositeOperation='source-atop';
-  g.fillStyle='rgba(96,8,8,0.48)';
-  g.beginPath(); g.ellipse(c.width*0.52,c.height*0.26,c.width*0.20,c.height*0.07,0.15,0,Math.PI*2); g.fill();
-  g.beginPath(); g.ellipse(c.width*0.36,c.height*0.50,c.width*0.16,c.height*0.11,-0.4,0,Math.PI*2); g.fill();
-  g.beginPath(); g.ellipse(c.width*0.62,c.height*0.58,c.width*0.11,c.height*0.08,0.6,0,Math.PI*2); g.fill();
+  const W=c.width,H=c.height;
+  g.fillStyle='rgba(214,36,28,0.90)';
+  g.beginPath(); g.ellipse(W*0.54,H*0.22,W*0.20,H*0.09,0.18,0,Math.PI*2); g.fill();
+  g.fillStyle='rgba(196,22,18,0.78)';
+  g.beginPath(); g.ellipse(W*0.36,H*0.42,W*0.12,H*0.16,-0.45,0,Math.PI*2); g.fill();
+  g.beginPath(); g.ellipse(W*0.64,H*0.52,W*0.14,H*0.09,0.55,0,Math.PI*2); g.fill();
+  g.fillStyle='rgba(232,52,36,0.62)';
+  g.beginPath(); g.ellipse(W*0.48,H*0.70,W*0.16,H*0.07,0.1,0,Math.PI*2); g.fill();
+  g.beginPath(); g.ellipse(W*0.28,H*0.30,W*0.07,H*0.05,-0.3,0,Math.PI*2); g.fill();
   return FCACHE[id]=c;
 }
 function sprFlash(k,x,y,sc,flip,col,alpha){
@@ -2508,7 +2507,9 @@ function draw(){
     const iw=mg.naturalWidth,ih=mg.naturalHeight,dest=WR*2;
     const sc=Math.max(dest/iw,dest/ih);
     const dw=iw*sc,dh=ih*sc;
+    ctx.imageSmoothingEnabled=false;
     ctx.drawImage(mg,-dw/2,-dh/2,dw,dh);
+    ctx.imageSmoothingEnabled=true;
   } else if(IMG.txSoil.complete&&IMG.txSoil.naturalWidth){
     const TS=760;
     const gx0=Math.floor(l/TS)*TS, gy0=Math.floor(t/TS)*TS;
@@ -2795,7 +2796,14 @@ function zKey(z){
 function drawZ(z){
   const [k,flip]=zKey(z), sc=ZSC[z.kind], base=z.y+z.r*.55;
   shadow(z.x,base-1,z.r*.9,z.r*.32,.5);
-  if(!sprSolid(k,z.x,base,sc,flip,'#6B4E2E')){
+  const gore=bloodSpr(k);
+  if(gore){
+    const S=SZ(k),w=S.w*(sc||1),h=S.h*(sc||1);
+    ctx.save(); ctx.globalAlpha=1; ctx.imageSmoothingEnabled=false;
+    ctx.translate(z.x,base); if(flip)ctx.scale(-1,1);
+    ctx.drawImage(gore,-w/2,-h,w,h);
+    ctx.restore();
+  } else if(!sprSolid(k,z.x,base,sc,flip,'#6B4E2E')){
     ctx.globalAlpha=1;
     ctx.fillStyle='#8B6A3A';ctx.beginPath();ctx.arc(z.x,z.y,z.r*1.2,0,TAU);ctx.fill();
     ctx.strokeStyle='#1A120C';ctx.lineWidth=2;ctx.stroke();
