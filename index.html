@@ -1300,7 +1300,7 @@ function reset(){
     const a=i*0.83+0.4, rr=1090+((i*197)%370);
     G.ruins.push({x:Math.cos(a)*rr,y:Math.sin(a)*rr,k:'r'+((i+3)%8),f:i%2===1,s:0.5});
   }
-  say('코어 가동. 아내가 사격을 시작한다.','good');
+  say('한겨울이다. 코어 가동. 아내가 사격을 시작한다.','good');
 }
 const L=k=>G.R[k]||0;
 /* 유예 구간: 7인 체제(구조 2회)를 완성할 때까지 바깥은 조용하다.
@@ -1510,7 +1510,7 @@ function mhud(){
   pb.className=G.vs.length>=popCap()?'bad':'';
   q('mTime').textContent=fmt(G.t);
   const w=q('mWave');
-  if(G.phase==='grace'){w.textContent='정착';w.className='';}
+  if(G.phase==='grace'){w.textContent='한겨울';w.className='';}
   else if(G.phase==='final'){w.textContent='최종';w.className='hot';}
   else if(G.finalPrep){w.textContent='대비';w.className='';}
   else if(G.phase==='assault'){w.textContent='웨이브 '+G.wave;w.className='hot';}
@@ -1624,7 +1624,7 @@ function pickKind(){
 }
 
 /* ═══════════ 이벤트 (구조 미션) ═══════════ */
-/* 구조 신호의 구성. 처음 두 번은 부부, 그 뒤로는 어른/아이 조합. */
+/* 구조 신호의 구성. 처음 두 번은 부부, 그 뒤로는 어른/아이 조합. 무전 문구에는 인원만 남긴다. */
 function rescueParty(){
   const n=G.rescueDone;
   if(n<2)return FIXED[n].map(nm=>({role:'worker',name:nm}));
@@ -1636,17 +1636,9 @@ function rescueParty(){
   return [{role:'child'},{role:'child'}];
 }
 function partyLabel(p){
-  const a=p.filter(m=>m.role!=='child').length;
-  const k=p.filter(m=>m.role==='child').length;
-  if(a===0&&k===1)return '아이 1명';
-  if(a===0&&k===2)return '아이 2명';
-  if(a===1&&k===0)return '생존자 1명';
-  if(a===1&&k===1)return '어른 1명과 아이 1명';
-  if(a===2&&k===0)return '부부 2명';
-  const bits=[];
-  if(a)bits.push('어른 '+a+'명');
-  if(k)bits.push('아이 '+k+'명');
-  return bits.join('과 ')||'생존자';
+  /* 무전은 인원만 알린다. 어른인지 아이인지는 가서 봐야 안다. */
+  const n=p.length;
+  return n<=1?'생존자 1명':'생존자 '+n+'명';
 }
 function triggerRescue(){
   const party=rescueParty();
@@ -2334,6 +2326,8 @@ function draw(){
     const sc=Math.max(dest/iw,dest/ih);
     const dw=iw*sc,dh=ih*sc;
     ctx.drawImage(mg,-dw/2,-dh/2,dw,dh);
+    ctx.fillStyle='rgba(170,200,220,0.07)';
+    ctx.fillRect(-WR,-WR,WR*2,WR*2);
   } else if(IMG.txSoil.complete&&IMG.txSoil.naturalWidth){
     const TS=760;
     const gx0=Math.floor(l/TS)*TS, gy0=Math.floor(t/TS)*TS;
@@ -2776,7 +2770,7 @@ function hud(dt){
   document.getElementById('sTime').textContent=fmt(g.t);
   document.getElementById('clock').className='panel'+(g.esc2===null?' calm':g.phase!=='lull'?'':isLongLull()?' lull long':' lull');
   const wph=g.phase;
-  document.getElementById('sWave').textContent = g.esc2===null ? '정착 단계'
+  document.getElementById('sWave').textContent = g.esc2===null ? '한겨울'
     : wph==='final' ? `최종 공세 · 남은 적 ${g.zs.length}`
     : g.finalPrep ? `최종 공세까지 ${Math.max(0,Math.ceil(FINAL_T-g.t))}초`
     : 'WAVE '+String(g.wave).padStart(2,'0')+(wph==='assault'?' · 공세':isLongLull()?' · 긴 소강':' · 소강');
