@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>좀비 디펜스</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -29,7 +29,7 @@
   --sans:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{height:100%;overflow:hidden}
+html{height:100%;overflow:hidden;touch-action:none}
 body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;
   background:var(--night);color:var(--paper);font-family:var(--sans);
   -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;
@@ -3369,6 +3369,16 @@ cv.addEventListener('pointercancel',upAny,{passive:false});
 /* 브라우저가 제스처로 오인해 터치를 가져가는 것을 막는다 */
 for(const t of ['touchstart','touchmove','touchend'])
   cv.addEventListener(t,e=>{if(e.cancelable)e.preventDefault();},{passive:false});
+/* iOS는 user-scalable=no를 무시하고 더블탭·핀치 줌을 켠다 */
+for(const t of ['gesturestart','gesturechange','gestureend'])
+  document.addEventListener(t,e=>e.preventDefault(),{passive:false});
+document.addEventListener('dblclick',e=>e.preventDefault());
+let lastTapEnd=0;
+document.addEventListener('touchend',e=>{
+  const now=performance.now();
+  if(now-lastTapEnd<350 && e.cancelable) e.preventDefault();
+  lastTapEnd=now;
+},{passive:false});
 document.getElementById('pcNo').onclick=()=>{endPlace();};
 document.getElementById('pcOk').onclick=()=>{
   const [gx,gy]=cellOf(ghost.x,ghost.y);
