@@ -272,13 +272,42 @@ select.asg:focus{outline:1px solid var(--hazard)}
 #over .btns{width:min(92vw,420px);gap:8px}
 #over .go{flex:1;padding:12px 10px;font-size:11px}
 #over .rec{margin-top:6px}
-#start{justify-content:center;align-items:center;padding:0;background:#0B0A08}
-#titleWrap{position:relative;max-width:100%;max-height:100%;line-height:0}
-#titleArt{max-width:100%;max-height:100vh;width:auto;height:auto;object-fit:contain;pointer-events:none;display:block}
+#start{justify-content:center;align-items:center;padding:0;background:#0B0A08;overflow:hidden}
+#titleWrap{position:absolute;inset:0;max-width:none;max-height:none;line-height:0}
+#titleArt{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;object-position:center 22%;
+  pointer-events:none;display:block}
 #titleHits{position:absolute;left:20%;width:60%;top:63%;height:30%;z-index:120;display:flex;flex-direction:column;
   pointer-events:auto}
 #titleHits button{flex:1;background:transparent;border:0;cursor:pointer;padding:0;
   touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+/* 폰 세로 — 그림 속 버튼은 잘리니 아래쪽에 실제 버튼을 깐다 */
+body.mob #start{justify-content:flex-end}
+body.mob #titleArt{object-position:center 18%}
+body.mob #titleHits{left:10%;width:80%;top:auto;bottom:calc(22px + env(safe-area-inset-bottom));
+  height:auto;gap:10px}
+body.mob #titleHits button{flex:none;height:52px;border:1px solid #7A5510;color:#221806;
+  font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.22em;
+  background:linear-gradient(180deg,#F0B62E,#C98A12);
+  box-shadow:0 3px 0 #6b4a0e,0 6px 16px rgba(0,0,0,.5)}
+body.mob #btnStart::after{content:"GAME START"}
+body.mob #btnOpt::after{content:"OPTION"}
+body.mob #btnExit::after{content:"EXIT"}
+body.mob #btnOpt,body.mob #btnExit{background:linear-gradient(180deg,#2A2418,#1A150F);color:#E4DAC2;
+  border-color:#6A5A3A;box-shadow:0 3px 0 #0A0806,0 6px 16px rgba(0,0,0,.45)}
+@media (max-width:760px){
+  #titleArt{object-position:center 18%}
+  #titleHits{left:10%;width:80%;top:auto;bottom:calc(22px + env(safe-area-inset-bottom));
+    height:auto;gap:10px}
+  #titleHits button{flex:none;height:52px;border:1px solid #7A5510;color:#221806;
+    font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.22em;
+    background:linear-gradient(180deg,#F0B62E,#C98A12);
+    box-shadow:0 3px 0 #6b4a0e,0 6px 16px rgba(0,0,0,.5)}
+  #btnStart::after{content:"GAME START"}
+  #btnOpt::after{content:"OPTION"}
+  #btnExit::after{content:"EXIT"}
+  #btnOpt,#btnExit{background:linear-gradient(180deg,#2A2418,#1A150F);color:#E4DAC2;
+    border-color:#6A5A3A;box-shadow:0 3px 0 #0A0806,0 6px 16px rgba(0,0,0,.45)}
+}
 #optPanel{display:none;position:fixed;inset:0;z-index:90;background:rgba(4,3,2,.72);
   align-items:center;justify-content:center}
 #optPanel.on{display:flex}
@@ -644,7 +673,7 @@ span.vface,span.pic{display:inline-block}
   background-position:calc(var(--pfc)*var(--pfs)*-1) calc(var(--pfr)*var(--pfs)*-1)}
 
 /* ── 시네마틱 인트로: 재난문자 → 트레일러 → 타이틀 ── */
-#cine{position:fixed;inset:0;z-index:200;background:#050403;display:flex;align-items:center;justify-content:center;transition:opacity .55s;pointer-events:auto}
+#cine{display:none;position:fixed;inset:0;z-index:200;background:#050403;align-items:center;justify-content:center;transition:opacity .55s;pointer-events:auto}
 #cine.out{opacity:0;pointer-events:none}
 #cAlert{display:none;width:min(88vw,360px);user-select:none;cursor:pointer;
   animation:cin .45s cubic-bezier(.2,1.4,.4,1) both,cshake .5s .5s steps(2) 3}
@@ -689,7 +718,7 @@ span.vface,span.pic{display:inline-block}
         <div class="cf">발신 : 국가재난안전본부&nbsp;&nbsp;&nbsp;긴급재난문자 2026-07-25 12:00</div>
       </div>
     </div>
-    <video id="cVid" src="intro.mp4?v=56" muted autoplay playsinline webkit-playsinline preload="auto"></video>
+    <video id="cVid" muted playsinline webkit-playsinline preload="none"></video>
     <div id="cBtns"><button id="cSnd">🔇 소리 켜기</button><button id="cSkip">건너뛰기 ▸</button></div>
   </div>
   <audio id="bgm" loop preload="auto" playsinline>
@@ -699,48 +728,9 @@ span.vface,span.pic{display:inline-block}
 
 <script>
 (function(){
+  /* 인트로 영상은 잠시 빼 둔다. 새 파일을 받으면 #cVid src만 다시 넣으면 된다. */
   var cine=document.getElementById('cine');
-  var vid=document.getElementById('cVid');
-  var skip=document.getElementById('cSkip');
-  var snd=document.getElementById('cSnd');
-  if(!cine||!vid)return;
-  var done=false;
-  function endCine(){
-    if(done)return; done=true;
-    try{vid.pause();}catch(e){}
-    cine.classList.add('out');
-    setTimeout(function(){ cine.style.display='none'; }, 560);
-    try{ if(window.unlockBgm) window.unlockBgm(); }catch(e){}
-  }
-  vid.addEventListener('ended', endCine);
-  vid.addEventListener('error', function(){ endCine(); });
-  vid.addEventListener('timeupdate', function(){
-    try{
-      if(vid.duration && isFinite(vid.duration) && vid.duration-vid.currentTime<0.3) endCine();
-    }catch(e){}
-  });
-  function bindSkip(el){
-    if(!el)return;
-    var f=function(e){ e.preventDefault(); e.stopPropagation(); endCine(); };
-    el.addEventListener('pointerup', f);
-    el.addEventListener('click', f);
-  }
-  bindSkip(skip);
-  if(snd){
-    snd.textContent='🔇 소리 켜기';
-    snd.addEventListener('pointerup', function(e){
-      e.preventDefault(); e.stopPropagation();
-      vid.muted=!vid.muted;
-      snd.textContent=vid.muted?'🔇 소리 켜기':'🔊 소리 끄기';
-      vid.play().catch(function(){});
-    });
-  }
-  function tryPlay(){ vid.play().catch(function(){ endCine(); }); }
-  tryPlay();
-  cine.addEventListener('pointerup', function(e){
-    if(e.target===snd || (snd && snd.contains(e.target))) return;
-    if(vid.paused) tryPlay();
-  });
+  if(cine) cine.style.display='none';
 })();
 </script>
 <canvas id="cv"></canvas>
