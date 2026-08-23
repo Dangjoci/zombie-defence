@@ -190,6 +190,8 @@ select.asg:focus{outline:1px solid var(--hazard)}
   animation:slide .3s ease-out}
 .msg .pic,.msg .vface{width:34px;height:34px;flex:none;object-fit:cover;object-position:50% 12%;
   border:1px solid #0A0806;image-rendering:pixelated}
+.msg .col{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.msg .nm{font-size:9px;font-weight:800;letter-spacing:.08em;color:#6A4E36;line-height:1.1}
 .msg span.tx{flex:1;min-width:0}
 @keyframes slide{from{opacity:0;transform:translateX(-9px)}}
 .msg.bad{border-left-color:#8F2F22}
@@ -985,7 +987,7 @@ function dir4(dx,dy){
 /* 총열 끝 위치 — 각 방향 스프라이트에서 실측한 비율 (가로, 세로) */
 const MUZ={h_f:[.987,.741],h_l:[.070,.731],h_r:[.925,.731],h_b:[.987,.741]};
 for(const k in SPR){const im=new Image();im.src=SPR[k].s;IMG[k]=im;}
-IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=69';
+IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=71';
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 /* 스프라이트는 바닥 중앙 기준으로 놓는다 — 발이 땅에 닿게 */
 /* 스프라이트 키가 바뀌어도 한 곳의 오타로 게임 전체가 죽지 않게 한다.
@@ -1597,12 +1599,18 @@ function bigAlert(title,sub,kind,dur,icon,face){
 function speakerV(who){
   if(who==='wife')return (G&&G.vs&&G.vs.find(v=>v.role==='wife'))||{role:'wife',name:'아내'};
   if(who==='child')return (G&&G.vs&&G.vs.find(v=>v.role==='child'&&v.name==='딸'))||{role:'child',name:'딸'};
-  return heroV();
+  if(who==='hero'||who==='나'||who==='주인공'||!who)return heroV();
+  if(G&&G.vs){const v=G.vs.find(x=>x.name===who); if(v)return v;}
+  return {role:'worker',name:String(who)};
 }
 function speakerName(who){
+  if(!who||who==='hero'||who==='나'||who==='주인공')return '';
   if(who==='wife')return '아내';
   if(who==='child')return '딸';
-  return '나';
+  return String(who);
+}
+function bannerName(m){
+  return speakerName(m&&m.who);
 }
 function say(t,k,who,face){
   G.msgs.push({t,k:k||'',life:4.2,who:who||null,face:face||''});
@@ -1669,7 +1677,9 @@ function renderBanner(){
   const list=MOB?G.msgs.slice(0,3):G.msgs;   // 좁은 화면에서는 최근 3건만
   document.getElementById('banner').innerHTML=list.map(m=>{
     const face=m.face||(m.who?pfHTML(speakerV(m.who),'pic'):'');
-    return `<div class="msg ${m.k}">${face}<span class="tx">${m.t}</span></div>`;
+    const nm=bannerName(m);
+    const label=nm?`<span class="nm">${nm.replace(/[<>&]/g,c=>({ '<':'&lt;','>':'&gt;','&':'&amp;' }[c]))}</span>`:'';
+    return `<div class="msg ${m.k}">${face}<span class="col">${label}<span class="tx">${m.t}</span></span></div>`;
   }).join('');
 }
 
@@ -1821,12 +1831,12 @@ function deliverRescue(){
     const names=new Set(joined.map(v=>v.name));
     if(names.has('종호')||names.has('진화')){
       const v=joined.find(x=>x.name==='종호')||{name:'종호',role:'worker',sex:'m'};
-      say('역시, 여기까지 오면 구하러 올 줄 알았지!','good',null,pfHTML(v,'pic'));
+      say('역시, 여기까지 오면 구하러 올 줄 알았지!','good',v.name||'종호',pfHTML(v,'pic'));
     } else if(names.has('종면')||names.has('미래')){
       const v=joined.find(x=>x.name==='종면')||{name:'종면',role:'worker',sex:'m'};
-      say('형! 살아있었구나! 장비 좀 챙기느라 늦었어.','good',null,pfHTML(v,'pic'));
+      say('형! 살아있었구나! 장비 좀 챙기느라 늦었어.','good',v.name||'종면',pfHTML(v,'pic'));
     } else {
-      for(const v of joined) say(joinLine(v),'good',null,pfHTML(v,'pic'));
+      for(const v of joined) say(joinLine(v),'good',v.name,pfHTML(v,'pic'));
     }
   }
   if(G.rescueDone>=2)escalate();
@@ -2454,10 +2464,10 @@ function removeV(v,starved){
   if(starved){ say(`${v.name}... 굶어서 쓰러졌어.`,'bad','hero'); return; }
   const face=pfHTML(v,'pic');
   if(v.role==='child'){
-    say('나가기 싫어! 두고 가지 마!', 'bad', null, face);
+    say('나가기 싫어! 두고 가지 마!', 'bad', v.name||'아이', face);
     say('밀어냈다. 멀리서 아이의 비명이 들렸다.', 'bad', 'hero');
   } else {
-    say('너희도 끝장날 거야! 저주받을 줄 알아!', 'bad', null, face);
+    say('너희도 끝장날 거야! 저주받을 줄 알아!', 'bad', v.name, face);
     say('어쩔 수 없다. 우리는 생존해야 한다. 멀리서 비명이 들려온다.', 'bad', 'hero');
   }
   sfx('over'); hap([0,80,40,80]); shake(4);
@@ -2504,30 +2514,6 @@ function draw(){
   ctx.save();ctx.beginPath();ctx.arc(0,0,WR,0,TAU);ctx.clip();
   ctx.fillStyle='#16130F';
   ctx.fillRect(-WR,-WR,WR*2,WR*2);
-  ctx.restore();
-  /* 격자는 건설 가능 구역에만 — 바깥까지 그으면 지저분하다 */
-  ctx.save();ctx.beginPath();ctx.arc(0,0,910,0,TAU);ctx.clip();
-  ctx.strokeStyle='rgba(26,18,9,.22)';ctx.lineWidth=1;ctx.beginPath();
-  for(let x=Math.floor(Math.max(l,-940)/CELL)*CELL;x<Math.min(r,940);x+=CELL){ctx.moveTo(x,-940);ctx.lineTo(x,940);}
-  for(let y=Math.floor(Math.max(t,-940)/CELL)*CELL;y<Math.min(b,940);y+=CELL){ctx.moveTo(-940,y);ctx.lineTo(940,y);}
-  ctx.stroke();ctx.restore();
-  // 경계
-  ctx.strokeStyle='rgba(176,58,46,.4)';ctx.lineWidth=3;ctx.setLineDash([14,10]);
-  ctx.beginPath();ctx.arc(0,0,WR,0,TAU);ctx.stroke();ctx.setLineDash([]);
-
-  // 안전지대
-  const CR=coreRng();
-  const gr=ctx.createRadialGradient(0,0,CR*.3,0,0,CR);
-  gr.addColorStop(0,'rgba(79,209,197,.09)');gr.addColorStop(1,'rgba(79,209,197,0)');
-  ctx.fillStyle=gr;ctx.beginPath();ctx.arc(0,0,CR,0,TAU);ctx.fill();
-  ctx.strokeStyle='rgba(79,209,197,.34)';ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.arc(0,0,CR,0,TAU);ctx.stroke();
-  // 레이더 스윕 — 시그니처
-  const sw=g.t*1.35%TAU;
-  ctx.save();ctx.rotate(sw);
-  const lg=ctx.createLinearGradient(0,0,CR,0);
-  lg.addColorStop(0,'rgba(79,209,197,.22)');lg.addColorStop(1,'rgba(79,209,197,0)');
-  ctx.fillStyle=lg;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,CR,-0.34,0);ctx.closePath();ctx.fill();
   ctx.restore();
 
   // 드랍
