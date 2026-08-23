@@ -2326,6 +2326,7 @@ function update(dt){
     v.mf=Math.max(0,(v.mf||0)-dt*9);
     if(Math.hypot(v.x,v.y)<coreRng())v.hp=Math.min(v.maxHp,v.hp+0.5*dt);
   });
+  parkIdle(dt);
 
   /* 호송 생존자 */
   g.esc=g.esc.filter(e=>!e.dead);
@@ -2463,20 +2464,40 @@ function autoAssign(){
     if(!v)break;
     v.job=b.id;b.worker=v;
   }
-  /* 탐색부대는 정원제 — 남는다고 무한정 붙지 않는다. 초과 인력은 '대기'로 남는다. */
-  let room=sqCap()-squad().length;
-  for(const v of G.vs){
-    if(room<=0)break;
-    if(v.role==='worker'&&!v.job&&!v.manual&&!hurtV(v)){
-      v.job='squad'; room--;
-      if(v.x===undefined){v.x=G.p.x;v.y=G.p.y;}
-      if(v.hp===undefined)v.hp=v.maxHp=sqMaxHp();
-    }
-  }
+  /* 남는 인원은 탐색에 자동으로 넣지 않는다. 주거지에서 논다. */
   /* 연구로 정원이 줄 일은 없지만, 초과분이 생기면 뒤에서부터 해제 */
   let over=squad().length-sqCap();
   if(over>0)for(let i=G.vs.length-1;i>=0&&over>0;i--)
     if(G.vs[i].job==='squad'&&!G.vs[i].manual){G.vs[i].job=null;over--;}
+}
+function idleFolk(){
+  if(!G)return [];
+  return G.vs.filter(v=>{
+    if(v.role==='hero'||v.role==='wife')return false;
+    if(v.role==='child'&&v.name==='딸')return false;
+    if(v.job==='squad')return false;
+    if(G.bs.some(b=>b.worker===v))return false;
+    return true;
+  });
+}
+function parkIdle(dt){
+  const folk=idleFolk();
+  const homes=G.bs.filter(b=>b.t==='house');
+  folk.forEach((v,i)=>{
+    const h=homes.length?homes[i%homes.length]:null;
+    const wob=i*1.7+G.t*0.55;
+    const cx=h?h.x:( -28+(i%3)*22 );
+    const cy=h?(h.y+18):(78+(i%2)*12);
+    const tx=cx+Math.cos(wob)*14;
+    const ty=cy+Math.sin(wob*0.85)*8;
+    if(v.x===undefined){v.x=tx;v.y=ty;}
+    const d=Math.hypot(tx-v.x,ty-v.y);
+    if(d>1.2){
+      const a=Math.atan2(ty-v.y,tx-v.x), sp=Math.min(86,d*4.2);
+      v.x+=Math.cos(a)*sp*dt; v.y+=Math.sin(a)*sp*dt;
+    }
+    v.fx=Math.cos(wob);
+  });
 }
 function heroV(){return (G&&G.vs&&G.vs.find(v=>v.role==='hero'))||{role:'hero',name:'나'};}
 function heroFace(){return pfHTML(heroV(),'pic');}
@@ -2635,6 +2656,7 @@ function draw(){
   for(const z of g.zs)if(z.x>l-60&&z.x<r+60&&z.y>t-90&&z.y<b+60)rend.push([z.y,drawZ,z]);
   for(const e of g.esc)if(!e.dead)rend.push([e.y,drawEsc,e]);
   for(const v of squad())if(v.x!==undefined)rend.push([v.y,drawSquad,v]);
+  for(const v of idleFolk())if(v.x!==undefined)rend.push([v.y,drawSquad,v]);
   rend.push([g.p.y,drawP,null]);
   rend.sort((A,B)=>A[0]-B[0]);
   for(const it of rend)it[1](it[2]);
