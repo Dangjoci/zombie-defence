@@ -637,7 +637,7 @@ span.vface,span.pic{display:inline-block}
   background-position:calc(var(--pfc)*var(--pfs)*-1) calc(var(--pfr)*var(--pfs)*-1)}
 
 /* ── 시네마틱 인트로: 재난문자 → 트레일러 → 타이틀 ── */
-#cine{display:none!important}
+#cine{position:fixed;inset:0;z-index:100;background:#050403;display:flex;align-items:center;justify-content:center;transition:opacity .55s}
 #cine.out{opacity:0;pointer-events:none}
 #cAlert{width:min(88vw,360px);user-select:none;cursor:pointer;
   animation:cin .45s cubic-bezier(.2,1.4,.4,1) both,cshake .5s .5s steps(2) 3}
@@ -654,7 +654,7 @@ span.vface,span.pic{display:inline-block}
 .cs{color:#E8A317;font-weight:800;font-size:16px;letter-spacing:.2em;margin-bottom:10px;text-shadow:0 0 14px rgba(232,163,23,.35)}
 .cx{color:#C0392B;font-size:12px;letter-spacing:.05em;margin-bottom:12px}
 .cf{border-top:1px solid #3A362E;color:#8F887A;font-size:10.5px;padding-top:8px;font-family:var(--mono)}
-#cVid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;background:#000}
+#cVid{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:none;background:#000}
 #cine.vid #cVid{display:block}
 #cBtns{position:absolute;top:calc(12px + env(safe-area-inset-top));right:14px;display:none;gap:8px;z-index:2}
 #cine.vid #cBtns{display:flex}
@@ -3667,8 +3667,44 @@ document.getElementById('lab').addEventListener('pointerdown',e=>{
 });
 document.getElementById('shDim').onclick=closeSheet;
 
-/* ── 시네마틱 인트로: 재난문자(자동) → 사선 스와이프 → 트레일러 → 타이틀 ── */
-document.getElementById('cine')&&(document.getElementById('cine').style.display='none');
+/* ── 시네마틱 인트로: 트레일러 → 타이틀 ── */
+(function(){
+  const cine=document.getElementById('cine');
+  const vid=document.getElementById('cVid');
+  const skip=document.getElementById('cSkip');
+  const snd=document.getElementById('cSnd');
+  const alert=document.getElementById('cAlert');
+  if(!cine||!vid)return;
+  if(alert)alert.style.display='none';
+  cine.classList.add('vid');
+  vid.src='intro.mp4';
+  vid.setAttribute('playsinline','');
+  vid.setAttribute('webkit-playsinline','');
+  vid.muted=true;
+  vid.loop=false;
+  let done=false;
+  const endCine=()=>{
+    if(done)return; done=true;
+    try{vid.pause();}catch(e){}
+    cine.classList.add('out');
+    setTimeout(()=>{cine.style.display='none';},560);
+  };
+  vid.addEventListener('ended',endCine);
+  if(skip)skip.addEventListener('pointerup',e=>{e.preventDefault();e.stopPropagation();endCine();});
+  if(snd){
+    snd.textContent='🔇 소리 켜기';
+    snd.addEventListener('pointerup',e=>{
+      e.preventDefault();e.stopPropagation();
+      vid.muted=!vid.muted;
+      snd.textContent=vid.muted?'🔇 소리 켜기':'🔊 소리 끄기';
+      vid.play().catch(()=>{});
+    });
+  }
+  const tryPlay=()=>vid.play().catch(()=>{});
+  if(vid.readyState>=2)tryPlay();
+  else vid.addEventListener('canplay',tryPlay,{once:true});
+  cine.addEventListener('pointerup',()=>{if(vid.paused)tryPlay();},{once:true});
+})();
 
 </script>
 </body>
