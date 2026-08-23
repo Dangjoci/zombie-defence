@@ -1319,8 +1319,8 @@ function loadGameInner(d){
   G.esc=(d.esc||[]).map(e=>({x:e.x,y:e.y,hp:e.hp,maxHp:e.maxHp,i:e.i,dead:!!e.dead,
     role:e.role,name:e.name,spr:e.spr}));
   G.msgs=[]; rosterSig='';
-  say('저장된 마을을 이어서 시작한다.','good');
-  if(G.zs.length)say(`주변에 ${G.zs.length}마리가 남아 있다.`,'bad');
+  say('여보, 다시 여기야. 이어서 간다.','good');
+  if(G.zs.length)say(`아직 밖에 ${G.zs.length}마리가 있어. 조심해.`,'bad');
   return true;
 }
 function reset(){
@@ -1352,7 +1352,8 @@ function reset(){
     const a=i*0.83+0.4, rr=1090+((i*197)%370);
     G.ruins.push({x:Math.cos(a)*rr,y:Math.sin(a)*rr,k:'r'+((i+3)%8),f:i%2===1,s:0.5});
   }
-  say('한겨울이다. 코어 가동. 아내가 사격을 시작한다.','good');
+  say('한겨울이다. 코어 켠다. 여보, 부탁해.','good');
+  say('여보, 내가 여기서 막을게. 당신은 앞으로.','good');
 }
 const L=k=>G.R[k]||0;
 /* 유예 구간: 7인 체제(구조 2회)를 완성할 때까지 바깥은 조용하다.
@@ -1395,7 +1396,7 @@ function spawnDungeon(){
     const a=i*TAU/3+rnd(-.18,.18);
     spawnZ('boss',d.id,d.x+Math.cos(a)*42,d.y+Math.sin(a)*42);
   }
-  say(`둥지가 생겼다 — 약 ${Math.round(r)}m. 터지기 전에 부숴라.`,'bad');
+  say(`저쪽에 둥지다. 약 ${Math.round(r)}m. 터지기 전에 부숴야 해.`,'bad');
   bigAlert('둥지 발생',`약 ${Math.round(r)}m · ${Math.round(d.breakAt)}초 후 붕괴`,'bad',3.4,'☣');
   sfx('boss'); hap([0,50,40,50]);
 }
@@ -1404,7 +1405,7 @@ function clearDungeon(d,i){
   for(let k=G.zs.length-1;k>=0;k--){const z=G.zs[k]; if(z.home===d.id){z.hp=0;killZ(z);}}
   burst(d.x,d.y,'#E8A317',48); shake(10); sfx('good'); hap([0,40,30,80]);
   dropItem(d.x,d.y,true);
-  say('둥지를 파괴했다. 영구 강화가 남았다.','good');
+  say('끝냈다. 쓸 만한 게 남았어.','good');
   bigAlert('둥지 파괴',`${G.dungCleared}번째 · 영구 강화를 회수하라`,'good',3.0,'✓');
 }
 function breakDungeon(d,i){
@@ -1416,7 +1417,7 @@ function breakDungeon(d,i){
     spawnZ(pickKind(),null,d.x+Math.cos(a)*r,d.y+Math.sin(a)*r);}
   G.fx.push({x:d.x,y:d.y,r:20,max:340,life:.9});
   shake(14); sfx('boss'); hap([0,120,60,160]);
-  say(`둥지가 터졌다 — ${n+extra}마리가 몰려온다.`,'bad');
+  say(`터졌다! ${n+extra}마리가 몰려온다!`,'bad');
   bigAlert('둥 지 붕 괴',`${n+extra}마리가 마을로 향한다`,'bad',3.4,'☠');
 }
 /* ── 최종 공세 ──
@@ -1454,7 +1455,7 @@ function firePulse(i){
   shake(11); sfx('boss'); hap([0,120,60,160]);
 }
 function startFinalWave(){
-  say('최종 공세 — 파도는 세 번. 전부 쓸어버려라.','bad');
+  say('마지막이다. 파도 세 번. 전부 막으면 끝이야.','bad');
   bigAlert('최 종 공 세','파도는 세 번 — 전부 없애면 끝난다','bad',4.2,'☠');
   shake(14); sfx('boss'); hap([0,140,60,140,60,200]);
 }
@@ -1490,21 +1491,21 @@ function victory(){
 }
 function onWaveStart(){
   const w=G.wave;
-  say(`웨이브 ${w} — 공세 시작.`,'bad');
+  say(`온다. 웨이브 ${w}. 버텨.`,'bad');
   const n=waveBurst(w);
   for(let i=0;i<n;i++)spawnZ(pickKind());
   shake(5);sfx('event');
   if(w%4===0){
     const n=1+Math.floor(w/12);
     for(let i=0;i<n;i++)spawnZ('boss');
-    say('거대 개체 접근 중.','bad');bigAlert('거대 개체 접근',`웨이브 ${w} · 코어를 지키십시오`,'bad',2.6);sfx('boss');
+    say('여보! 거대 개체가 온다! 코어 지켜!','bad');bigAlert('거대 개체 접근',`웨이브 ${w} · 코어를 지키십시오`,'bad',2.6);sfx('boss');
   }
 }
 function escalate(){
   if(G.esc2!==null)return;
   G.esc2=G.t; G.wave=1; G.phase='assault'; G.waveT=0;
-  say('마을이 자리를 잡았다. 그리고 바깥이 조용하지 않다.','bad');
-  say('웨이브 1 — 공세 시작.','bad');
+  say('자리 잡았다. 이제 바깥이 심상치 않아.','bad');
+  say('첫 파도다. 막는다.','bad');
   sfx('boss');
 }
 
@@ -1621,14 +1622,14 @@ function canPlace(gx,gy){
 function place(type,gx,gy){
   const def=BDEF[type], cost=bCost(type);
   if(G.scrap<cost){say('고철이 부족하다.','bad');return false;}
-  if(!canPlace(gx,gy)){say('그 자리엔 지을 수 없다.','bad');return false;}
+  if(!canPlace(gx,gy)){say('여긴 못 지어. 자리 옮겨.','bad');return false;}
   G.scrap-=cost;
   const b={id:Math.random(),t:type,gx,gy,x:gx*CELL+CELL/2,y:gy*CELL+CELL/2,
     hp:def.hp,maxHp:def.hp,worker:null,cd:0,tier:1,flash:0,ang:0,paid:cost};
   if(type==='wall')b.hp=b.maxHp=def.hp*(1+.6*L('wallHp'));
   G.bs.push(b); G.grid[gk(gx,gy)]=b;
   if(type==='lab'&&G.bs.filter(x=>x.t==='lab').length===1)
-    say('연구소 가동. 우측 상단 [연구] 버튼이나 R 키로 연구 목록을 연다.','good');
+    say('연구소 올렸다. 연구 목록 열어봐.','good');
   sfx('build');
   return true;
 }
@@ -1695,7 +1696,7 @@ function partyLabel(p){
 function triggerRescue(){
   const party=rescueParty();
   if(G.vs.length+party.length>popCap()){
-    say('신호를 받았지만 받아줄 공간이 없다 — 주거지가 필요하다.','bad');
+    say('신호는 잡혔는데 받아줄 방이 없어. 주거지가 필요해.','bad');
     G.nextEvent=G.t+12; return;
   }
   /* 가까운 신호부터 소진된다 — 구할수록 더 멀리 나가야 한다 */
@@ -1704,7 +1705,7 @@ function triggerRescue(){
   G.rescue={x:Math.cos(a)*r,y:Math.sin(a)*r,taken:false,timer:0,party,dist:Math.round(r),
     ttl:RESCUE_TTL, warned:false};
   G.evStage++;
-  say(`무전 수신 — ${partyLabel(party)} · 약 ${Math.round(r)}m. ${RESCUE_TTL}초 안에 닿아야 한다.`,'good');
+  say(`무전이다. ${partyLabel(party)}. 약 ${Math.round(r)}m. ${RESCUE_TTL}초 안에 닿아야 해.`,'good');
   hap([0,30,50,30]);
   bigAlert('생존자의 구조 신호가 잡혔습니다',
     `${partyLabel(party)} · 약 ${Math.round(r)}m · ${RESCUE_TTL}초 남음`,'',3.8);
@@ -1717,7 +1718,7 @@ function loseRescue(){
   burst(R.x,R.y,'#B03A2E',22);
   G.rescue=null; G.rescueDone++;
   G.nextEvent=G.t+rnd(13,19);
-  say('멀리서 비명이 들려왔다. 신호가 끊겼다.','bad');
+  say('늦었어. 신호가 끊겼다...','bad');
   bigAlert('비명이 들려왔다',`${who} · 늦었다`,'bad',3.2,'✕');
   sfx('over'); hap([0,120,70,120]); shake(6);
 }
@@ -1732,7 +1733,7 @@ function pickupRescue(){
       hp,maxHp:hp,i,dead:false,role:m.role,name:m.name,sex,
       spr:bodyKey(ev)});
   });
-  say(P.length===1?'찾았다. 코어까지 호송하라.':'찾았다. 전원 코어까지 호송하라.','good');
+  say(P.length===1?'찾았다. 코어까지 데려가자.':'찾았다. 전원 코어까지 데려가자.','good');
   bigAlert('호송을 시작합니다','코어까지 안전하게 데려가십시오','good',2.8,'▲'); sfx('event');
 }
 function deliverRescue(){
@@ -1756,7 +1757,7 @@ function deliverRescue(){
   } else {
     say(names.length?`${names.join(', ')} — 마을에 합류했다.`:'아무도 데려오지 못했다.',names.length?'good':'bad');
   }
-  if(alive.some(e=>e.role==='child'))say('아이는 일을 하지 못한다. 먹기만 한다.','bad');
+  if(alive.some(e=>e.role==='child'))say('아이는 일 못 시켜. 먹기만 해.','bad');
   if(quote) bigAlert(quote.who, quote.line, 'good', 4.4, '✓', pfHTML(faceV,'pic'));
   else if(names.length)bigAlert('나', `${names.join(', ')} — 마을에 합류했다.`, 'good', 3.2, '✓', heroFace());
   else bigAlert('나','아무도 데려오지 못했다.','bad',2.8,'✕',heroFace());
@@ -1785,7 +1786,7 @@ function update(dt){
       const left=Math.max(0,g.rescue.ttl);
       if(!g.rescue.warned&&left<=15){
         g.rescue.warned=true;
-        say('무전에 비명이 섞인다 — 시간이 없다.','bad');
+        say('무전에 비명이 섞여. 시간이 없다!','bad');
         bigAlert('비명이 들려온다','15초 안에 닿지 못하면 늦는다','bad',2.6,'!');
         sfx('event'); hap([0,50,40,50]);
       }
@@ -1793,14 +1794,14 @@ function update(dt){
       else {
         g.rescue.remind=(g.rescue.remind||0)+dt;
         if(g.rescue.remind>9){g.rescue.remind=0;
-          say(`생존자가 아직 기다린다 — ${Math.round(dist(g.p.x,g.p.y,g.rescue.x,g.rescue.y))}m · ${Math.ceil(left)}초`,'good');}
+          say(`아직 기다려. ${Math.round(dist(g.p.x,g.p.y,g.rescue.x,g.rescue.y))}m. ${Math.ceil(left)}초밖에 없어.`,'good');}
       }
     }
     /* loseRescue()가 g.rescue를 비울 수 있으므로 아래는 반드시 다시 확인한다 */
     if(g.rescue){
       if(!g.rescue.taken && dist(g.p.x,g.p.y,g.rescue.x,g.rescue.y)<44) pickupRescue();
       if(g.rescue&&g.rescue.taken){
-        if(g.esc.every(e=>e.dead)){say('구조 실패. 아무도 데려오지 못했다.','bad');bigAlert('구조에 실패했습니다','아무도 데려오지 못했습니다','bad',2.8);g.esc=[];g.rescue=null;g.nextEvent=g.t+23;}
+        if(g.esc.every(e=>e.dead)){say('데려오지 못했다. 내가 늦었어.','bad');bigAlert('구조에 실패했습니다','아무도 데려오지 못했습니다','bad',2.8);g.esc=[];g.rescue=null;g.nextEvent=g.t+23;}
         else if(g.esc.some(e=>!e.dead&&Math.hypot(e.x,e.y)<170)) deliverRescue();
       }
     }
@@ -1814,7 +1815,7 @@ function update(dt){
       const cand=g.vs.filter(v=>v.role==='worker'&&!hurtV(v));
       if(cand.length){
         const v=cand[cand.length-1];
-        say(`잘 곳이 없다 — ${iga(v.name)} 마을을 떠났다.`,'bad');
+        say(`자리가 없어... ${iga(v.name)} 떠났어.`,'bad');
         bigAlert('주거지 부족',`${iga(v.name)} 떠났다 · 인구 ${g.vs.length-1}/${popCap()}`,'bad',2.6,'✕');
         removeV(v,true);
       }
@@ -1835,8 +1836,8 @@ function update(dt){
       refund+=Math.round(70*(1-Math.max(0,D.hp)/D.maxHp));
       burst(D.x,D.y,'#E8A317',20); g.dung.splice(i,1);
     }
-    if(refund>0){g.scrap+=refund; say(`둥지 진압 진행분 회수 — 고철 ${refund}.`,'good');}
-    say('무전이 끊겼다. 마지막이 온다 — 준비하라. 지금은 수리비가 절반이다.','bad');
+    if(refund>0){g.scrap+=refund; say(`진압하다 만 고철 ${refund}, 일단 챙긴다.`,'good');}
+    say('무전이 끊겼다. 마지막이 온다. 지금 수리는 반값이야. 준비해.','bad');
     bigAlert('최종 공세를 준비하세요',`${Math.round(FINAL_T-g.t)}초 뒤 시작 · 지금 수리는 반값`,'',5.2,'!');
     sfx('event'); hap([0,120,80,120]);
   }
@@ -1879,7 +1880,7 @@ function update(dt){
     d.t+=dt; d.flash=Math.max(0,d.flash-dt*5);
     const left=d.breakAt-d.t;
     if(!d.warned&&left<15){d.warned=true;
-      say('둥지가 부풀고 있다 — 곧 터진다.','bad');
+      say('둥지가 부풀어. 곧 터진다!','bad');
       bigAlert('둥지 붕괴 임박',`약 ${Math.round(left)}초`,'bad',2.4,'!');}
     // 좀비를 계속 모은다
     d.acc+=dt*(1.05+0.16*(g.dungCleared+g.dungBroke))*1.3;
@@ -1941,7 +1942,7 @@ function update(dt){
   for(const v of g.vs){
     if(v.hurt&&v.hurt<=g.t){
       v.hurt=0; v.maxHp=sqMaxHp(); v.hp=v.maxHp;
-      say(`${iga(v.name)} 회복해 복귀했다.`,'good');
+      say(`${v.name}, 돌아왔어. 다시 버틸 수 있어.`,'good');
     }
   }
   if(pd<coreRng())p.hp=Math.min(p.maxHp,p.hp+0.9*dt);
@@ -1975,7 +1976,7 @@ function update(dt){
   const ovl=g.phase==='final'&&C.hp<C.maxHp*0.25;
   if(ovl&&!g.ovlSaid){
     g.ovlSaid=true;
-    say('코어 과부하 — 안전장치 해제. 한계 출력으로 사격한다.','good');
+    say('코어 과부하야! 한계까지 쏜다!','good');
     bigAlert('코어 과부하','안전장치 해제 · 연사 +80%','good',2.8,'⚡');
     sfx('good'); hap([0,60,40,60]);
   }
@@ -2038,7 +2039,7 @@ function update(dt){
       g.starve=0;
       const cand=g.vs.filter(v=>v.role!=='hero');
       if(cand.length){const v=cand[ri(0,cand.length-1)];removeV(v,true);}
-      else {g.p.hp-=3;say('먹을 것이 없다. 몸이 버티지 못한다.','bad');}
+      else {g.p.hp-=3;say('아빠... 배가 고파. 식량이 없어.','bad');}
     }
   } else g.starve=0;
 
@@ -2094,7 +2095,7 @@ function update(dt){
     const hit=blockAt(nx,ny,z.r);
     if(hit){
       if(z.cd<=0){z.cd=1;hit.hp-=z.sdmg;hit.flash=1;
-        if(hit.hp<=0){burst(hit.x,hit.y,'#7a6a52',16);demolishSilent(hit);say(`${iga(BDEF[hit.t].n)} 무너졌다.`,'bad');}}
+        if(hit.hp<=0){burst(hit.x,hit.y,'#7a6a52',16);demolishSilent(hit);say(`${BDEF[hit.t].n}, 무너졌어!`,'bad');}}
       // 슬라이드
       const sx=blockAt(z.x+Math.cos(a)*sp*dt,z.y,z.r), sy=blockAt(z.x,z.y+Math.sin(a)*sp*dt,z.r);
       if(!sx)z.x+=Math.cos(a)*sp*dt*.6; else if(!sy)z.y+=Math.sin(a)*sp*dt*.6;
@@ -2116,10 +2117,10 @@ function update(dt){
             burst(e.x,e.y,'#B03A2E',14); hap(60);
             e.job=null; e.manual=false; e.hurt=G.t+45; e.hp=1;
             e.x=undefined; e.y=undefined;
-            say(`${iga(e.name)} 부상당해 후송됐다. (45초)`,'bad');
+            say(`${e.name}이 다쳤어. 후송한다. 45초.`,'bad');
             bigAlert('대원 부상',`${e.name} · 45초 후 복귀`,'bad',2.2);
           } else if(!e.dead){
-            e.dead=true;burst(e.x,e.y,'#B03A2E',14);say('호송 중인 생존자가 당했다.','bad');
+            e.dead=true;burst(e.x,e.y,'#B03A2E',14);say('이런... 호송 중에 당했어.','bad');
           }
         }}
     }
@@ -2233,11 +2234,11 @@ function grabItem(it){
   if(it.perm){
     G.perks[it.k]=(G.perks[it.k]||0)+1;
     bigAlert('영구 강화 획득',`${I.n} — ${I.d}`+(I.f?`<br><i>${I.f}</i>`:''),'',3.0,'★');
-    say(`${I.n} 영구 획득.`,'good');
+    say(`${I.n}, 챙겼다. 이건 끝까지 간다.`,'good');
     if(I.f)say(I.f,'good');
   } else {
     G.buffs[it.k]=G.t+ITEM_SEC;
-    say(`${I.n} — ${I.d} (${ITEM_SEC}초)`,'good');
+    say(`${I.n}. ${I.d} 잠깐이다.`,'good');
     if(I.f)say(I.f,'good');
   }
   sfx('good'); hap(25);
@@ -2249,13 +2250,13 @@ function killZ(z){
   G.itemCd-=1;
   if(G.itemCd<=0&&G.items.filter(x=>!x.perm).length<2){
     G.itemCd=ri(75,135); dropItem(z.x,z.y,false);
-    say('무언가 떨어졌다.','good');
+    say('뭔가 떨어졌다. 주워.','good');
   }
   burst(z.x,z.y,'#82A83E',z.kind==='boss'?40:9);
   const n=z.kind==='boss'?14:1;
   for(let k=0;k<n;k++)
     G.dr.push({x:z.x+rnd(-9,9),y:z.y+rnd(-9,9),v:Math.max(1,Math.round(z.val/n*dropMul())),life:26,bob:rnd(0,TAU)});
-  if(z.kind==='boss'){say('거대 개체 격파.','good');shake(12);}
+  if(z.kind==='boss'){say('거대 개체, 쓰러뜨렸다.','good');shake(12);}
 }
 /* 현재 방향 스프라이트의 총열 끝 월드 좌표 */
 function muzzle(){
@@ -2351,7 +2352,7 @@ function removeV(v,starved){
   if(v.role==='hero')return;
   const b=G.bs.find(b=>b.worker===v); if(b)b.worker=null;
   G.vs.splice(G.vs.indexOf(v),1);
-  if(starved){ say(`${iga(v.name)} 굶주림으로 쓰러졌다.`,'bad'); return; }
+  if(starved){ say(`${v.name}... 굶어서 쓰러졌어.`,'bad'); return; }
   if(v.role==='child'){
     const a='아이는 울면서 나가기 싫다고 버텼지만 우리는 아이를 밀어냈다.';
     const b='멀리서 아이의 비명소리가 들렸다.';
@@ -2942,8 +2943,8 @@ function renderRoster(){
     const val=sl.value;
     if(!val){ v.job=null; v.manual=true; }
     else if(val==='squad'){
-      if(hurtV(v)){say(`${v.name}은(는) 아직 부상 중이다.`,'bad');renderRoster();return;}
-      if(squad().length>=sqCap()&&v.job!=='squad'){say(`부대 정원이 찼다 (${sqCap()}명). 연구로 늘려라.`,'bad');renderRoster();return;}
+      if(hurtV(v)){say(`${v.name}은 아직 다친 상태야. 기다려.`,'bad');renderRoster();return;}
+      if(squad().length>=sqCap()&&v.job!=='squad'){say(`부대가 꽉 찼어. ${sqCap()}명. 연구로 늘려야 해.`,'bad');renderRoster();return;}
       v.job='squad'; v.manual=true; if(v.x===undefined){v.x=G.p.x;v.y=G.p.y;}
     }
     else{
@@ -2993,11 +2994,11 @@ function refreshBuildCosts(){
 function pickBuild(t){
   if(t==='core'){
     if(G.scrap>=coreCost()){G.scrap-=coreCost();G.core.lvl++;G.core.hp+=60;
-      say(`코어 ${G.core.lvl}단계 — 화력과 안전지대가 넓어졌다.`,'good');sfx('good');}
+      say(`코어 ${G.core.lvl}단계. 화력이 늘었어.`,'good');sfx('good');}
     else say('고철이 부족하다.','bad');
     return;
   }
-  if(!G.unlock[t]){say('아직 해금되지 않았다.','bad');return;}
+  if(!G.unlock[t]){say('아직 안 열린다.','bad');return;}
   selBuild=selBuild===t?null:t; selObj=null;
   document.getElementById('sel').style.display='none';
   if(TOUCH){
@@ -3062,7 +3063,7 @@ function renderLab(){
       <div class="ae">${Math.round(pct*100)}% · ${eta===Infinity?(aiOn()?'연구소 없음 — 정지됨':'연구소 무인 — 정지됨'):'남은 시간 약 '+eta+'초'}</div>
       <button class="act" id="rsCancel">연구 취소 (고철 ${Math.floor(R.paid*0.5)} 반환)</button>`;
     ab.querySelector('#rsCancel').onclick=()=>{
-      G.scrap+=Math.floor(R.paid*0.5); G.rs=null; say('연구를 중단했다.','bad'); renderLab();
+      G.scrap+=Math.floor(R.paid*0.5); G.rs=null; say('연구 끊었다.','bad'); renderLab();
     };
   } else ab.style.display='none';
   const wrap=document.getElementById('trees'), tabs=document.getElementById('labTabs');
@@ -3116,7 +3117,7 @@ function toggleLab(force){
   const el=document.getElementById('lab');
   const open=force!==undefined?force:el.style.display!=='block';
   if(open){
-    if(!G.bs.some(b=>b.t==='lab')){say('연구소를 먼저 건설해야 한다.','bad');return;}
+    if(!G.bs.some(b=>b.t==='lab')){say('연구소부터 올려야 해.','bad');return;}
     renderLab();el.style.display='block';mode='lab';
     document.getElementById('labX').style.display=MOB?'flex':'none';
   } else {el.style.display='none';mode='play';last=performance.now();
@@ -3484,7 +3485,7 @@ function assignV(v,val){
   const old=G.bs.find(b=>b.worker===v); if(old)old.worker=null;
   if(!val){ v.job=null; v.manual=true; }
   else if(val==='squad'){
-    if(squad().length>=sqCap()&&v.job!=='squad'){say(`부대 정원이 찼다 (${sqCap()}명).`,'bad');return;}
+    if(squad().length>=sqCap()&&v.job!=='squad'){say(`부대가 꽉 찼어. ${sqCap()}명이야.`,'bad');return;}
     v.job='squad'; v.manual=true; if(v.x===undefined){v.x=G.p.x;v.y=G.p.y;}
     if(v.hp===undefined)v.hp=v.maxHp=sqMaxHp();
   } else {
