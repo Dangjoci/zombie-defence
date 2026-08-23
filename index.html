@@ -987,7 +987,7 @@ function dir4(dx,dy){
 /* 총열 끝 위치 — 각 방향 스프라이트에서 실측한 비율 (가로, 세로) */
 const MUZ={h_f:[.987,.741],h_l:[.070,.731],h_r:[.925,.731],h_b:[.987,.741]};
 for(const k in SPR){const im=new Image();im.src=SPR[k].s;IMG[k]=im;}
-IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=72';
+IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=73';
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 /* 스프라이트는 바닥 중앙 기준으로 놓는다 — 발이 땅에 닿게 */
 /* 스프라이트 키가 바뀌어도 한 곳의 오타로 게임 전체가 죽지 않게 한다.
@@ -2361,9 +2361,9 @@ function killZ(z){
 /* 현재 방향 스프라이트의 총열 끝 월드 좌표 */
 function muzzle(){
   const p=G.p, k='h_'+dir4(Math.cos(p.ang),Math.sin(p.ang));
-  const S=SZ(k), m=MUZ[k], base=p.y+12;
-  const rawY=base-S.h+m[1]*S.h, hipY=base-S.h+S.h*HERO_CUT;
-  let mx=p.x+(m[0]-0.5)*S.w, my=rawY;
+  const S=SZ(k), m=MUZ[k], base=p.y+14, sc=HERO_SC, w=S.w*sc, h=S.h*sc;
+  const rawY=base-h+m[1]*h, hipY=base-h+h*HERO_CUT;
+  let mx=p.x+(m[0]-0.5)*w, my=rawY;
   /* 달릴 때 그림은 허리에서 잘려 다리만 전단된다. 총이 다리 쪽에 걸리면
      총구도 같은 만큼 밀어야 화염·탄이 총열 끝에 붙는다. */
   if(rawY>hipY) mx += (p.mv||0)*Math.sin(p.rp||0)*0.30*(rawY-hipY);
@@ -2690,12 +2690,12 @@ function drawCore(){
   ctx.strokeStyle=hp>.4?'#4FD1C5':'#E26A1A';ctx.lineWidth=5;
   ctx.beginPath();ctx.arc(0,10,66,-Math.PI/2,-Math.PI/2+TAU*hp);ctx.stroke();
   /* 가족 — 아내는 관제탑 난간에서 사격하고, 딸은 코어 옆에서 서성인다 */
-  if(hasWife())spr('wife',16,-46,.60,C.fa!==undefined&&Math.cos(C.fa)<0);
+  if(hasWife())spr('wife',18,-52,1.05,C.fa!==undefined&&Math.cos(C.fa)<0);
   const kid=G.vs.find(v=>v.role==='child');
   if(kid){
     const tt=G.t*0.42, kx=-44+Math.sin(tt)*11, ky=50+Math.cos(tt*0.8)*4;
     shadow(kx,ky,7,2.8,.4);
-    spr('kidg',kx,ky,1,Math.cos(tt)<0);
+    spr('kidg',kx,ky,KID_SC,Math.cos(tt)<0);
   }
   ctx.font='700 11px ui-monospace,monospace';ctx.textAlign='center';
   ctx.fillStyle='#0b0f0d';ctx.fillText('LV '+C.lvl,0,84);
@@ -2722,6 +2722,18 @@ function drawB(b){
   shadow(b.x,base-3,CELL*0.40*sc,CELL*0.16,.45);
   if(!spr(k,b.x,base,sc,(b.t==='tower'&&(b.worker||aiOn()))?(Math.cos(b.ang)<0):false, dim)){
     ctx.fillStyle=d.col;ctx.fillRect(x+3,y+3,CELL-6,CELL-6);
+  }
+  /* 배치된 주민은 LED만이 아니라 건물 위(지붕/발판)에 선다 */
+  if(b.worker){
+    const v=b.worker, vk=bodyKey(v);
+    const kid=v.role==='child'||v.name==='딸';
+    const vsc=kid?KID_SC:HUM_SC;
+    const bh=SZ(k).h*sc;
+    const roof={tower:0.58,farm:0.38,house:0.42,lab:0.48,wall:0.55}[b.t]||0.45;
+    const foot=base-bh*roof;
+    const ox=(b.t==='tower'?6:(b.t==='farm'?-4:0));
+    shadow(b.x+ox,foot-2,10,3.5,.4);
+    sprSolid(vk,b.x+ox,foot,vsc,(b.t==='tower'&&Math.cos(b.ang||0)<0),'#3D4A38');
   }
   if(b.flash>0)sprFlash(k,b.x,base,sc,false,'#FFF0DC',b.flash*.75);
   // 2단계는 금색 테두리로 구분
@@ -2751,6 +2763,10 @@ function drawB(b){
 const ZK={walker:'zs',runner:'zs',brute:'zm',boss:'zL'};
 const ZRATE={walker:5,runner:9.5,brute:3.6,boss:2.4};
 const ZSC={walker:1.62,runner:1.48,brute:1.54,boss:1.42};
+/* 소형 좀비(walker 화면 키 ≈38*1.62)에 맞춘 사람 배율 */
+const HERO_SC=1.28;
+const HUM_SC=1.84;
+const KID_SC=1.45;
 function zKey(z){
   /* 0은 falsy라 ||를 쓰면 안 된다 — 정확히 0일 때 방향이 뒤집힌다 */
   const fx=(z.fx===undefined?0:z.fx), fy=(z.fy===undefined?1:z.fy);
@@ -2791,7 +2807,7 @@ function drawZ(z){
     }
   }
 }
-const ESC_SC=1.38;
+const ESC_SC=HUM_SC;
 const SQ_M=['v5','v3'], SQ_F=['v0','v1','v2','v4'];
 function bodyKey(v){
   const n=v.name||'', h=[...n].reduce((a,c)=>a+c.charCodeAt(0),0);
@@ -2803,8 +2819,9 @@ function bodyKey(v){
 }
 function drawSquad(v){
   v.spr=bodyKey(v);
-  const S=SZ(v.spr), sc=1.38, base=v.y+9, top=base-S.h*sc;
-  shadow(v.x,v.y+7,10,4,.42);
+  const kid=v.role==='child'||v.name==='딸';
+  const S=SZ(v.spr), sc=kid?KID_SC:HUM_SC, base=v.y+9, top=base-S.h*sc;
+  shadow(v.x,v.y+7,12,4.5,.42);
   sprSolid(v.spr,v.x,base,sc,(v.fx||0)<0,'#3D4A38');
   if(v.mf>0){
     ctx.save();ctx.globalCompositeOperation='lighter';
@@ -2842,22 +2859,22 @@ function heroParts(src,iw,ih,x,base,w,h,mv,ph,bob){
 }
 function drawHero(k,x,base,mv,ph,bob,alpha){
   const im=hardenSpr(k); if(!im)return false;
-  const S=SZ(k), a=alpha===undefined?1:alpha;
+  const S=SZ(k), a=alpha===undefined?1:alpha, sc=HERO_SC;
   ctx.save();ctx.globalAlpha=a;
-  heroParts(im,im.width,im.height,x,base,S.w,S.h,mv,ph,bob);
+  heroParts(im,im.width,im.height,x,base,S.w*sc,S.h*sc,mv,ph,bob);
   ctx.restore();return true;
 }
 function drawHeroTint(k,x,base,mv,ph,bob,col,alpha){
   const c=silhouette(k,col);if(!c)return;
-  const S=SZ(k);
+  const S=SZ(k), sc=HERO_SC;
   ctx.save();ctx.globalAlpha=alpha;
-  heroParts(c,c.width,c.height,x,base,S.w,S.h,mv,ph,bob);
+  heroParts(c,c.width,c.height,x,base,S.w*sc,S.h*sc,mv,ph,bob);
   ctx.restore();
 }
 function drawP(){
   const p=G.p, k='h_'+dir4(Math.cos(p.ang),Math.sin(p.ang));
   const base=p.y+14, mv=p.mv||0, ph=p.rp||0, bob=p.bob||0;
-  shadow(p.x,p.y+12,16,5.2,.55);
+  shadow(p.x,p.y+12,18,6,.55);
   const hit=p.inv>0&&Math.floor(p.inv*20)%2;
   if(!drawHero(k,p.x,base,mv,ph,bob,hit?.5:1)){
     ctx.fillStyle='#D8DED6';ctx.beginPath();ctx.arc(p.x,p.y,13,0,TAU);ctx.fill();
