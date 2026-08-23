@@ -1399,6 +1399,8 @@ function reset(){
   G.ruins=[];
   say('한겨울이다. 코어 켠다. 여보, 부탁해.','good','hero');
   say('여보, 내가 여기서 막을게. 당신은 앞으로.','good','wife');
+  say('우리 여기 이사온거야? 무서워…','bad','child');
+  say('걱정하지 마. 아빠가 지켜줄게.','good','hero');
 }
 const L=k=>G.R[k]||0;
 /* 유예 구간: 7인 체제(구조 2회)를 완성할 때까지 바깥은 조용하다.
@@ -1680,7 +1682,7 @@ function mhud(){
   if(document.body)document.body.classList.toggle('placing',placing);
 }
 function renderBanner(){
-  const list=MOB?G.msgs.slice(0,3):G.msgs;   // 좁은 화면에서는 최근 3건만
+  const list=MOB?G.msgs.slice(-3):G.msgs;   // 좁은 화면에서는 최근 3건만
   document.getElementById('banner').innerHTML=list.map(m=>{
     const face=m.face||(m.who?pfHTML(speakerV(m.who),'pic'):'');
     const nm=bannerName(m);
