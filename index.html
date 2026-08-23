@@ -2768,12 +2768,13 @@ function drawB(b){
   if(b.worker){
     const v=b.worker, vk=bodyKey(v);
     const kid=v.role==='child'||v.name==='딸';
-    const vsc=kid?KID_SC:HUM_SC;
+    /* 건물 위 주민은 코어 아내(44×1.22) 높이에 맞춘다 */
+    const vsc=kid?2.05:(SZ('wife').h*1.22/Math.max(1,SZ(vk).h));
     const bh=SZ(k).h*sc;
     const roof={tower:0.58,farm:0.38,house:0.42,lab:0.48,wall:0.55}[b.t]||0.45;
     const foot=base-bh*roof;
     const ox=(b.t==='tower'?6:(b.t==='farm'?-4:0));
-    shadow(b.x+ox,foot-2,10,3.5,.4);
+    shadow(b.x+ox,foot-2,14,5,.4);
     sprSolid(vk,b.x+ox,foot,vsc,(b.t==='tower'&&Math.cos(b.ang||0)<0),'#3D4A38');
   }
   if(b.flash>0)sprFlash(k,b.x,base,sc,false,'#FFF0DC',b.flash*.75);
