@@ -982,7 +982,7 @@ function dir4(dx,dy){
 /* 총열 끝 위치 — 각 방향 스프라이트에서 실측한 비율 (가로, 세로) */
 const MUZ={h_f:[.987,.741],h_l:[.070,.731],h_r:[.925,.731],h_b:[.987,.741]};
 for(const k in SPR){const im=new Image();im.src=SPR[k].s;IMG[k]=im;}
-IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=56';
+IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=58';
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 /* 스프라이트는 바닥 중앙 기준으로 놓는다 — 발이 땅에 닿게 */
 /* 스프라이트 키가 바뀌어도 한 곳의 오타로 게임 전체가 죽지 않게 한다.
@@ -2761,7 +2761,7 @@ function drawB(b){
 }
 const ZK={walker:'zs',runner:'zs',brute:'zm',boss:'zL'};
 const ZRATE={walker:5,runner:9.5,brute:3.6,boss:2.4};
-const ZSC={walker:1.28,runner:1.18,brute:1.22,boss:1.16};
+const ZSC={walker:1.62,runner:1.48,brute:1.54,boss:1.42};
 function zKey(z){
   /* 0은 falsy라 ||를 쓰면 안 된다 — 정확히 0일 때 방향이 뒤집힌다 */
   const fx=(z.fx===undefined?0:z.fx), fy=(z.fy===undefined?1:z.fy);
@@ -2771,18 +2771,13 @@ function zKey(z){
 }
 function drawZ(z){
   const [k,flip]=zKey(z), sc=ZSC[z.kind], base=z.y+z.r*.55;
-  shadow(z.x,base-1,z.r*.85,z.r*.3,.45);
+  shadow(z.x,base-1,z.r*1.05,z.r*.36,.55);
+  /* 설원에서 안 묻히게 외곽선 먼저 */
+  sprFlash(k,z.x+1,base+1,sc*1.08,flip,'#140E0A',.9);
+  sprFlash(k,z.x,base,sc*1.06,flip,'#F3E6C4',.55);
   if(!spr(k,z.x,base,sc,flip)){
-    ctx.fillStyle='#6E6588';ctx.beginPath();ctx.arc(z.x,z.y,z.r,0,TAU);ctx.fill();
-  } else {
-    const b=bloodSpr(k);
-    if(b){
-      const S=SZ(k),w=S.w*sc,h=S.h*sc;
-      ctx.save(); ctx.imageSmoothingEnabled=false;
-      ctx.translate(z.x,base); if(flip)ctx.scale(-1,1);
-      ctx.drawImage(b,-w/2,-h,w,h);
-      ctx.restore();
-    }
+    ctx.fillStyle='#C4A46A';ctx.beginPath();ctx.arc(z.x,z.y,z.r*1.15,0,TAU);ctx.fill();
+    ctx.strokeStyle='#1A120C';ctx.lineWidth=2;ctx.stroke();
   }
   if(z.flash>0)sprFlash(k,z.x,base,sc,flip,'#FFF6EB',z.flash);
   if(z.enr){   // 광포화 — 붉게 달아오른 채 달려온다
@@ -2809,7 +2804,7 @@ function drawZ(z){
     }
   }
 }
-const ESC_SC=1.15;
+const ESC_SC=1.38;
 const SQ_M=['v5','v3'], SQ_F=['v0','v1','v2','v4'];
 function bodyKey(v){
   const n=v.name||'', h=[...n].reduce((a,c)=>a+c.charCodeAt(0),0);
@@ -2821,7 +2816,7 @@ function bodyKey(v){
 }
 function drawSquad(v){
   v.spr=bodyKey(v);
-  const S=SZ(v.spr), sc=1.15, base=v.y+9, top=base-S.h*sc;
+  const S=SZ(v.spr), sc=1.38, base=v.y+9, top=base-S.h*sc;
   shadow(v.x,v.y+7,10,4,.42);
   spr(v.spr,v.x,base,sc,(v.fx||0)<0);
   if(v.mf>0){
@@ -2874,8 +2869,8 @@ function drawHeroTint(k,x,base,mv,ph,bob,col,alpha){
 }
 function drawP(){
   const p=G.p, k='h_'+dir4(Math.cos(p.ang),Math.sin(p.ang));
-  const base=p.y+12, mv=p.mv||0, ph=p.rp||0, bob=p.bob||0;
-  shadow(p.x,p.y+10,13,4.5,.5);
+  const base=p.y+14, mv=p.mv||0, ph=p.rp||0, bob=p.bob||0;
+  shadow(p.x,p.y+12,16,5.2,.55);
   const hit=p.inv>0&&Math.floor(p.inv*20)%2;
   if(!drawHero(k,p.x,base,mv,ph,bob,hit?.5:1)){
     ctx.fillStyle='#D8DED6';ctx.beginPath();ctx.arc(p.x,p.y,13,0,TAU);ctx.fill();
