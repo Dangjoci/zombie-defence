@@ -1760,31 +1760,28 @@ function pickupRescue(){
   say(P.length===1?'찾았다. 코어까지 데려가자.':'찾았다. 전원 코어까지 데려가자.','good','hero');
   bigAlert('호송을 시작합니다','코어까지 안전하게 데려가십시오','good',2.8,'▲'); sfx('event');
 }
+function joinLine(v){
+  if(v.name==='종호')return '역시, 여기까지 오면 구하러 올 줄 알았지!';
+  if(v.name==='종면')return '형! 살아있었구나! 장비 좀 챙기느라 늦었어.';
+  if(v.role==='child')return '저... 짐은 못 들어요. 밥은 조금만 먹을게요.';
+  const k=bestApt(v);
+  if(k==='tower')return '총은 좀 만져봤어요. 감시탑에 넣어주세요.';
+  if(k==='farm')return '땅은 좀 알아요. 농사 맡기면 밥은 걱정 없을 거예요.';
+  if(k==='lab')return '머리 쓰는 일은 자신 있어요. 연구소에 넣고 싶어요.';
+  if(k==='squad')return '밖은 제가 뛰겠습니다. 탐색은 맡겨요.';
+  return '살아서 여기까지 왔어요. 쓰임새는 찾아볼게요.';
+}
 function deliverRescue(){
   const alive=G.esc.filter(e=>!e.dead);
-  const names=[]; let firstV=null;
-  for(const e of alive){const v=newVillager(e.role,e.name);G.vs.push(v);if(!firstV)firstV=v;names.push(v.name+(e.role==='child'?'(아이)':''));}
+  const joined=[];
+  for(const e of alive){const v=newVillager(e.role,e.name,e.sex);G.vs.push(v);joined.push(v);}
   G.esc=[];G.rescue=null;G.rescueDone++;
   G.maxPop=Math.max(G.maxPop,G.vs.length);
-  const nm=new Set(alive.map(e=>e.name));
-  let quote=null, faceV=firstV;
-  if(nm.has('종호')||nm.has('진화')){
-    quote={who:'종호', line:'역시, 여기까지 오면 구하러 올 줄 알았지!'};
-    faceV=G.vs.find(v=>v.name==='종호')||{name:'종호',role:'worker',sex:'m'};
-  } else if(nm.has('종면')||nm.has('미래')){
-    quote={who:'종면', line:'형! 살아있었구나! 장비 좀 챙기느라 늦었어.'};
-    faceV=G.vs.find(v=>v.name==='종면')||{name:'종면',role:'worker',sex:'m'};
-  }
-  if(quote){
-    say(quote.line,'good');
-    if(names.length)say(`${names.join(', ')} — 마을에 합류했다.`,'good','hero');
+  if(!joined.length){
+    say('데려오지 못했다. 내가 늦었어.','bad','hero');
   } else {
-    say(names.length?`${names.join(', ')} — 마을에 합류했다.`:'아무도 데려오지 못했다.',names.length?'good':'bad','hero');
+    for(const v of joined) say(joinLine(v),'good',null,pfHTML(v,'pic'));
   }
-  if(alive.some(e=>e.role==='child'))say('아이는 일 못 시켜. 먹기만 해.','bad','hero');
-  if(quote) bigAlert(quote.who, quote.line, 'good', 4.4, '✓', pfHTML(faceV,'pic'));
-  else if(names.length)bigAlert('나', `${names.join(', ')} — 마을에 합류했다.`, 'good', 3.2, '✓', heroFace());
-  else bigAlert('나','아무도 데려오지 못했다.','bad',2.8,'✕',heroFace());
   if(G.rescueDone>=2)escalate();
   G.nextEvent=G.t+rnd(13,19);
   renderBuild();
