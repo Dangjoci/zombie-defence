@@ -982,7 +982,7 @@ function dir4(dx,dy){
 /* 총열 끝 위치 — 각 방향 스프라이트에서 실측한 비율 (가로, 세로) */
 const MUZ={h_f:[.987,.741],h_l:[.070,.731],h_r:[.925,.731],h_b:[.987,.741]};
 for(const k in SPR){const im=new Image();im.src=SPR[k].s;IMG[k]=im;}
-IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=58';
+IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=59';
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 /* 스프라이트는 바닥 중앙 기준으로 놓는다 — 발이 땅에 닿게 */
 /* 스프라이트 키가 바뀌어도 한 곳의 오타로 게임 전체가 죽지 않게 한다.
@@ -1050,6 +1050,17 @@ function sprFlash(k,x,y,sc,flip,col,alpha){
   ctx.save();ctx.imageSmoothingEnabled=false;ctx.globalAlpha=Math.max(0,Math.min(1,alpha===undefined?1:alpha));
   ctx.translate(x,y);if(flip)ctx.scale(-1,1);
   ctx.drawImage(c,-w/2,-h,w,h);ctx.restore();
+}
+/* 반투명 가장자리를 불투명 몸통으로 받친다 */
+function sprSolid(k,x,y,sc,flip,under){
+  const im=IMG[k]; if(!im||!im.complete||!im.naturalWidth)return false;
+  const S=SZ(k),w=S.w*(sc||1),h=S.h*(sc||1);
+  ctx.save(); ctx.globalAlpha=1; ctx.imageSmoothingEnabled=false;
+  ctx.translate(x,y); if(flip)ctx.scale(-1,1);
+  const sil=silhouette(k,under||'#4E3A28');
+  if(sil)ctx.drawImage(sil,-w/2,-h,w,h);
+  ctx.drawImage(im,-w/2,-h,w,h);
+  ctx.restore(); return true;
 }
 let VW=0,VH=0,DPR=1;
 let ZOOM=1;
@@ -2771,12 +2782,10 @@ function zKey(z){
 }
 function drawZ(z){
   const [k,flip]=zKey(z), sc=ZSC[z.kind], base=z.y+z.r*.55;
-  shadow(z.x,base-1,z.r*1.05,z.r*.36,.55);
-  /* 설원에서 안 묻히게 외곽선 먼저 */
-  sprFlash(k,z.x+1,base+1,sc*1.08,flip,'#140E0A',.9);
-  sprFlash(k,z.x,base,sc*1.06,flip,'#F3E6C4',.55);
-  if(!spr(k,z.x,base,sc,flip)){
-    ctx.fillStyle='#C4A46A';ctx.beginPath();ctx.arc(z.x,z.y,z.r*1.15,0,TAU);ctx.fill();
+  shadow(z.x,base-1,z.r*.9,z.r*.32,.5);
+  if(!sprSolid(k,z.x,base,sc,flip,'#6B4E2E')){
+    ctx.globalAlpha=1;
+    ctx.fillStyle='#8B6A3A';ctx.beginPath();ctx.arc(z.x,z.y,z.r*1.2,0,TAU);ctx.fill();
     ctx.strokeStyle='#1A120C';ctx.lineWidth=2;ctx.stroke();
   }
   if(z.flash>0)sprFlash(k,z.x,base,sc,flip,'#FFF6EB',z.flash);
@@ -2818,7 +2827,7 @@ function drawSquad(v){
   v.spr=bodyKey(v);
   const S=SZ(v.spr), sc=1.38, base=v.y+9, top=base-S.h*sc;
   shadow(v.x,v.y+7,10,4,.42);
-  spr(v.spr,v.x,base,sc,(v.fx||0)<0);
+  sprSolid(v.spr,v.x,base,sc,(v.fx||0)<0,'#3D4A38');
   if(v.mf>0){
     ctx.save();ctx.globalCompositeOperation='lighter';
     ctx.fillStyle='rgba(255,204,130,'+v.mf+')';
@@ -2834,7 +2843,7 @@ function drawSquad(v){
 function drawEsc(e){
   const k=e.spr||bodyKey(e), top=e.y+9-SZ(k).h*ESC_SC;
   shadow(e.x,e.y+7,10,4,.42);
-  spr(k,e.x,e.y+9,ESC_SC,false);
+  sprSolid(k,e.x,e.y+9,ESC_SC,false,'#3D4A38');
   const w=18,hp=Math.max(0,e.hp/e.maxHp);
   ctx.fillStyle='rgba(0,0,0,.75)';ctx.fillRect(e.x-w/2,top-6,w,3);
   ctx.fillStyle=hp>.4?'#4FD1C5':'#E26A1A';ctx.fillRect(e.x-w/2,top-6,w*hp,3);
@@ -2855,8 +2864,10 @@ function heroParts(src,iw,ih,x,base,w,h,mv,ph,bob){
 }
 function drawHero(k,x,base,mv,ph,bob,alpha){
   const im=IMG[k];if(!im||!im.complete||!im.naturalWidth)return false;
-  const S=SZ(k);
-  ctx.save();if(alpha!==undefined)ctx.globalAlpha=alpha;
+  const S=SZ(k), a=alpha===undefined?1:alpha;
+  ctx.save();ctx.globalAlpha=a;
+  const sil=silhouette(k,'#3A3428');
+  if(sil)heroParts(sil,sil.width,sil.height,x,base,S.w,S.h,mv,ph,bob);
   heroParts(im,im.naturalWidth,im.naturalHeight,x,base,S.w,S.h,mv,ph,bob);
   ctx.restore();return true;
 }
