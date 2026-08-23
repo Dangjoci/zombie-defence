@@ -2467,8 +2467,13 @@ function autoAssign(){
     if(!v)break;
     v.job=b.id;b.worker=v;
   }
-  /* 남는 인원은 탐색에 자동으로 넣지 않는다. 주거지에서 논다. */
-  /* 연구로 정원이 줄 일은 없지만, 초과분이 생기면 뒤에서부터 해제 */
+  /* 남는 인원은 탐색부대로 넣는다. 정원 넘치면 뒤에서 해제 */
+  for(const v of G.vs){
+    if(v.role!=='worker'||v.job||v.manual||hurtV(v))continue;
+    if(squad().length>=sqCap())break;
+    v.job='squad';
+    if(v.x===undefined){v.x=G.p.x;v.y=G.p.y;}
+  }
   let over=squad().length-sqCap();
   if(over>0)for(let i=G.vs.length-1;i>=0&&over>0;i--)
     if(G.vs[i].job==='squad'&&!G.vs[i].manual){G.vs[i].job=null;over--;}

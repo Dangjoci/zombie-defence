@@ -1,8 +1,8 @@
-/* 좀비 디펜스 — 오프라인 캐시
-   테스트 중에는 게임 파일을 자주 갈아끼우므로, HTML은 '네트워크 우선'으로 가져온다.
-   그래야 새로 올린 버전이 바로 반영된다. 오프라인이면 캐시로 떨어진다.
-   아이콘·매니페스트는 잘 안 바뀌므로 '캐시 우선'. */
-const CACHE = 'zd-v9';
+/* 좀�??�펜?????�프?�인 캐시
+   ?�스??중에??게임 ?�일???�주 갈아?�우므�? HTML?� '?�트?�크 ?�선'?�로 가?�온??
+   그래???�로 ?�린 버전??바로 반영?�다. ?�프?�인?�면 캐시�??�어진다.
+   ?�이콘·매?�페?�트??????바뀌�?�?'캐시 ?�선'. */
+const CACHE = 'zd-v10';
 const CORE  = ['./', './index.html', './manifest.webmanifest',
                './icon-192.png', './icon-512.png', './apple-touch-icon.png',
                './assets/map-top.png'];
@@ -23,8 +23,7 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const isDoc = e.request.mode === 'navigate' || e.request.destination === 'document';
   if (isDoc) {
-    // 최신 우선 — 새 버전을 올리면 다음 실행에서 바로 잡힌다
-    e.respondWith(
+    // 최신 ?�선 ????버전???�리�??�음 ?�행?�서 바로 ?�힌??    e.respondWith(
       fetch(e.request)
         .then(res => { const cp = res.clone(); caches.open(CACHE).then(c => c.put('./index.html', cp)); return res; })
         .catch(() => caches.match('./index.html'))
