@@ -251,10 +251,21 @@ select.asg:focus{outline:1px solid var(--hazard)}
   pointer-events:auto;text-align:center;padding:22px}
 #over{display:none}
 .over{z-index:40;overflow-y:auto}          /* 타이틀·결과 화면은 어떤 UI보다 위에 */
-/* 내용이 화면보다 길어지면 중앙 정렬 대신 스크롤 — 위가 잘리지 않게 */
-#over{justify-content:flex-start}
-#over>:first-child{margin-top:auto}
-#over>:last-child{margin-bottom:auto}
+#over{justify-content:center;gap:8px;
+  padding:calc(10px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom))}
+#over .ttl{font-size:min(8.6vw,36px)}
+#over .sub{margin-top:6px}
+#overStats{margin:8px 0}
+#overStats div{padding:7px 9px}
+#overStats .v{font-size:16px}
+#luwak{margin:0}
+#luwak svg{width:min(22vw,92px)}
+#luwak .lkKo{font-size:13px;margin-top:6px}
+#luwak .lkFine{margin-top:6px}
+#nextMsg{margin:0;padding:10px 14px;max-width:min(92vw,430px)}
+#over .btns{width:min(92vw,420px);gap:8px}
+#over .go{flex:1;padding:12px 10px;font-size:11px}
+#over .rec{margin-top:6px}
 #start{justify-content:flex-end;padding:0;background:
   url('assets/title-bg.png') center center/cover no-repeat, #0B0A08}
 #titleHits{position:absolute;left:50%;transform:translateX(-50%);bottom:11%;
@@ -353,13 +364,13 @@ select.asg:focus{outline:1px solid var(--hazard)}
   background:radial-gradient(circle at 38% 34%,rgba(255,208,120,.55),rgba(200,140,30,.32));
   border:2px solid var(--hazard);left:36px;top:36px;
   box-shadow:0 2px 8px rgba(0,0,0,.55)}
-body.mob.ingame #joy{left:calc(30px + env(safe-area-inset-left));
-  bottom:calc(58px + env(safe-area-inset-bottom));top:auto;display:block}
-body.sa.mob.ingame #joy{bottom:calc(16px + env(safe-area-inset-bottom))}
+body.mob.ingame #joy{left:calc(16px + env(safe-area-inset-left));
+  bottom:calc(12px + env(safe-area-inset-bottom));top:auto;display:block}
+body.sa.mob.ingame #joy{bottom:calc(10px + env(safe-area-inset-bottom))}
 body.placing #joy{display:none !important}
 /* 터치 배치 확정 바 */
 #pconf{position:absolute;left:50%;transform:translateX(-50%);display:none;gap:10px;
-  bottom:calc(112px + env(safe-area-inset-bottom));pointer-events:auto;z-index:4}
+  bottom:calc(86px + env(safe-area-inset-bottom));pointer-events:auto;z-index:4}
 #pconf.on{display:flex}
 .pc{padding:13px 22px;font-size:14px;font-weight:700;letter-spacing:.02em;cursor:pointer;
   border:1px solid #0A0806;background-image:var(--tex-metal);color:var(--paper);
@@ -461,12 +472,12 @@ body.mob.ingame #mhud{display:flex;position:absolute;left:0;right:0;top:0;z-inde
 
 /* 우하단 큰 버튼 3개 — 엄지 반경 안 */
 /* 화면 최하단에 모은 4개 버튼. 사파리 하단 툴바에 가리지 않도록 여백을 둔다. */
-body.mob.ingame #mact{display:flex;position:absolute;left:46%;right:0;bottom:0;z-index:6;gap:5px;
+body.mob.ingame #mact{display:flex;position:absolute;left:42%;right:0;bottom:0;z-index:6;gap:6px;
   pointer-events:auto;align-items:stretch;
   background:linear-gradient(180deg,rgba(10,8,5,0),rgba(10,8,5,.72) 42%);
-  padding:8px calc(8px + env(safe-area-inset-right)) calc(58px + env(safe-area-inset-bottom)) 6px}
-body.sa.mob.ingame #mact{padding-bottom:calc(10px + env(safe-area-inset-bottom))}
-#mact button{pointer-events:auto;touch-action:manipulation;position:relative;flex:1;min-width:0;height:56px;border-radius:9px;
+  padding:6px calc(8px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) 6px}
+body.sa.mob.ingame #mact{padding-bottom:calc(8px + env(safe-area-inset-bottom))}
+#mact button{pointer-events:auto;touch-action:manipulation;position:relative;flex:1;min-width:0;height:62px;border-radius:9px;
   border:1px solid #0A0806;background-image:var(--tex-metal);background-color:#1A150F;cursor:pointer;
   box-shadow:inset 0 0 0 1px rgba(158,136,98,.2),inset 0 -4px 8px rgba(0,0,0,.5),0 3px 8px rgba(0,0,0,.6);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
@@ -1328,7 +1339,10 @@ function spawnDungeon(){
   const d={id:Math.random(),x:Math.cos(a)*r,y:Math.sin(a)*r,hp,maxHp:hp,
     t:0, breakAt:Math.max(hard?52:62,(hard?100:110)-7*c), acc:0, flash:0, warned:false};
   G.dung.push(d);
-  spawnZ('boss',d.id,d.x,d.y);   // 둥지마다 대형 좀비 1
+  for(let i=0;i<3;i++){
+    const a=i*TAU/3+rnd(-.18,.18);
+    spawnZ('boss',d.id,d.x+Math.cos(a)*42,d.y+Math.sin(a)*42);
+  }
   say(`둥지가 생겼다 — 약 ${Math.round(r)}m. 터지기 전에 부숴라.`,'bad');
   bigAlert('둥지 발생',`약 ${Math.round(r)}m · ${Math.round(d.breakAt)}초 후 붕괴`,'bad',3.4,'☣');
   sfx('boss'); hap([0,50,40,50]);
