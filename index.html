@@ -985,7 +985,7 @@ function dir4(dx,dy){
 /* 총열 끝 위치 — 각 방향 스프라이트에서 실측한 비율 (가로, 세로) */
 const MUZ={h_f:[.987,.741],h_l:[.070,.731],h_r:[.925,.731],h_b:[.987,.741]};
 for(const k in SPR){const im=new Image();im.src=SPR[k].s;IMG[k]=im;}
-IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=68';
+IMG.mapGround=new Image();IMG.mapGround.src='assets/map-ground.jpg?v=69';
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 /* 스프라이트는 바닥 중앙 기준으로 놓는다 — 발이 땅에 닿게 */
 /* 스프라이트 키가 바뀌어도 한 곳의 오타로 게임 전체가 죽지 않게 한다.
@@ -2502,19 +2502,8 @@ function draw(){
 
   // 지면 — 마을 야드 맵 (월드 좌표 cover, 카메라 추적)
   ctx.save();ctx.beginPath();ctx.arc(0,0,WR,0,TAU);ctx.clip();
-  const mg=IMG.mapGround;
-  if(mg&&mg.complete&&mg.naturalWidth){
-    const iw=mg.naturalWidth,ih=mg.naturalHeight,dest=WR*2;
-    const sc=Math.max(dest/iw,dest/ih);
-    const dw=iw*sc,dh=ih*sc;
-    ctx.imageSmoothingEnabled=false;
-    ctx.drawImage(mg,-dw/2,-dh/2,dw,dh);
-    ctx.imageSmoothingEnabled=true;
-  } else if(IMG.txSoil.complete&&IMG.txSoil.naturalWidth){
-    const TS=760;
-    const gx0=Math.floor(l/TS)*TS, gy0=Math.floor(t/TS)*TS;
-    for(let x=gx0;x<r;x+=TS)for(let y=gy0;y<b;y+=TS)ctx.drawImage(IMG.txSoil,x,y,TS,TS);
-  } else {ctx.fillStyle='#4A3D2C';ctx.fillRect(l,t,r-l,b-t);}
+  ctx.fillStyle='#16130F';
+  ctx.fillRect(-WR,-WR,WR*2,WR*2);
   ctx.restore();
   /* 격자는 건설 가능 구역에만 — 바깥까지 그으면 지저분하다 */
   ctx.save();ctx.beginPath();ctx.arc(0,0,910,0,TAU);ctx.clip();
